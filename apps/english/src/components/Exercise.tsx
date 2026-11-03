@@ -66,7 +66,7 @@ function PictureExercise({ exercise, onAnswer }: { exercise: Extract<Exercise, {
 function ListenExercise({ exercise, onAnswer }: { exercise: Extract<Exercise, { kind: 'listen' }>; onAnswer: Props['onAnswer'] }) {
   const { t } = useI18n();
   useEffect(() => {
-    void say(exercise.word.en);
+    void say(exercise.word.en, { auto: true });
   }, [exercise.word.en]);
   return (
     <div className="ex ex--listen">
@@ -156,7 +156,7 @@ function SpellExercise({ exercise, phase, onAnswer }: { exercise: Extract<Exerci
   const built = picked.map((i) => letters[i]).join('');
 
   useEffect(() => {
-    void say(exercise.word.en);
+    void say(exercise.word.en, { auto: true });
     setPicked([]);
   }, [exercise]);
 
@@ -213,7 +213,7 @@ function SentenceExercise({ exercise, phase, onAnswer }: { exercise: Extract<Exe
   const built = picked.map((i) => exercise.tiles[i]).join(' ');
 
   useEffect(() => {
-    void say(exercise.sentence, { sentence: true });
+    void say(exercise.sentence, { sentence: true, auto: true });
     setPicked([]);
   }, [exercise]);
 

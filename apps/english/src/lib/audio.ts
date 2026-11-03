@@ -17,14 +17,27 @@ export function sentenceAudioUrl(text: string): string {
 }
 
 let current: HTMLAudioElement | null = null;
+/**
+ * Every request gets a token. A newer request bumps it, which tells any
+ * slower older request to shut up — otherwise a cancelled mp3 resolves as
+ * "failed" and speaks the system voice *on top of* the new mp3.
+ */
+let token = 0;
 
 function stop(): void {
+  token += 1;
   if (current) {
+    current.onended = null;
+    current.onerror = null;
     current.pause();
     current.currentTime = 0;
     current = null;
   }
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if ('speechSynthesis' in window) {
+    // Safari can keep the queue after a single cancel(); ask twice.
+    window.speechSynthesis.cancel();
+    setTimeout(() => window.speechSynthesis.cancel(), 0);
+  }
 }
 
 /** Play a generated mp3; resolves false when the file is not there. */
@@ -34,6 +47,8 @@ function playFile(url: string): Promise<boolean> {
     current = audio;
     audio.onended = () => resolve(true);
     audio.onerror = () => resolve(false);
+    // A play() that is interrupted by pause()/a new request rejects too; the
+    // caller's token check decides whether that false is worth acting on.
     audio.play().catch(() => resolve(false));
   });
 }
@@ -91,11 +106,22 @@ function speakAloud(text: string): void {
  * Say something in English: pre-generated audio first, system voice second.
  * Never throws — a silent exercise is still answerable.
  */
-export async function say(text: string, opts: { sentence?: boolean } = {}): Promise<void> {
+export async function say(
+  text: string,
+  opts: { sentence?: boolean; auto?: boolean } = {},
+): Promise<void> {
   stop();
+  const my = token;
   const url = opts.sentence ? sentenceAudioUrl(text) : wordAudioUrl(text);
   const played = await playFile(url);
-  if (!played) speakAloud(text);
+  if (my !== token) return; // superseded while the file was loading
+
+  // Auto-play never falls back to the system voice: on iOS the first
+  // un-gestured play() is blocked, and speaking then makes an adult voice
+  // talk over the mp3 the child triggers a second later. Silent beats that.
+  if (played || opts.auto) return;
+  if (current && !current.paused) return;
+  speakAloud(text);
 }
 
 export function stopSpeaking(): void {
