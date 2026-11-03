@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const browser = await chromium.launch({ channel: 'chrome' });
+const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, deviceScaleFactor: 2 });
+const page = await ctx.newPage();
+await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
+await page.evaluate(() => document.fonts.ready);
+await page.getByRole('button', { name: /Print worksheet/ }).click();
+await page.waitForSelector('.print-sheet');
+await page.waitForTimeout(200);
+await page.pdf({ path: 'shots/worksheet.pdf', format: 'A4', printBackground: true });
+await browser.close();
+console.log('pdf written');

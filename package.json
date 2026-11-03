@@ -1,0 +1,38 @@
+{
+  "name": "bunny-math",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A cute addition & subtraction playground for 8-year-olds.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "e2e:install": "echo 'using system Chrome via channel=chrome; no browser download needed'"
+  },
+  "dependencies": {
+    "@fontsource-variable/fredoka": "^5.2.8",
+    "@fontsource-variable/nunito": "^5.2.7",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.2.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.22.0"
+}
