@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ channel: 'chrome' });
+const p = await (await b.newContext({ viewport: { width: 1180, height: 820 }, deviceScaleFactor: 2 })).newPage();
+const errors = [];
+p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
+await p.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+await p.waitForTimeout(600);
+console.log('root children:', await p.evaluate(() => document.querySelector('#root')?.children.length));
+console.log('errors:', JSON.stringify(errors.slice(0, 5)));
+await p.screenshot({ path: 'shots/30-root-base.png' });
+await b.close();

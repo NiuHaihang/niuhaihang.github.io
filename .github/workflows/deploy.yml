@@ -37,10 +37,22 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
-      - name: Build for the repository sub-path
+      # A user/org site (<name>.github.io) is served from "/", every other
+      # repository from "/<repo>/". Getting this wrong yields a blank page:
+      # the HTML loads, the hashed assets 404.
+      - name: Work out the base path
+        id: base
+        run: |
+          if [[ "${{ github.event.repository.name }}" == *.github.io ]]; then
+            echo "value=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=/${{ github.event.repository.name }}/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
         run: pnpm build
         env:
-          VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_BASE: ${{ steps.base.outputs.value }}
 
       - uses: actions/configure-pages@v5
 
