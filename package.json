@@ -6,8 +6,11 @@
   "description": "Little learning games for kids: Bunny Math and Bunny English.",
   "scripts": {
     "dev": "pnpm --filter @bunny/math dev",
-    "build": "pnpm --filter @bunny/math build",
-    "test": "pnpm --filter @bunny/math test",
+    "dev:math": "pnpm --filter @bunny/math dev",
+    "dev:english": "pnpm --filter @bunny/english dev",
+    "build": "pnpm -r build",
+    "build:site": "node scripts/build-site.mjs",
+    "test": "pnpm -r --if-present test",
     "e2e": "pnpm --filter @bunny/math e2e",
     "typecheck": "pnpm -r typecheck"
   },

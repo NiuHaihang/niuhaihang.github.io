@@ -1,6 +1,28 @@
-# 🐰 Bunny Math
+# 🐰 Bunny Learn
 
 [English](README.md) | [中文](README.zh.md)
+
+A **pure front-end** learning site for an 8-year-old: two apps, one repo, one deploy.
+
+| App | URL | What |
+| --- | --- | --- |
+| 🐰 Bunny Math | `/` | add, subtract, multiply, divide — 18 questions a round |
+| 🐰 Bunny English | `/english/` | PEP textbook vocabulary, phonics and grammar — 12 questions a lesson |
+
+```bash
+pnpm install
+pnpm dev:math       # math    → http://127.0.0.1:5173
+pnpm dev:english    # english → http://127.0.0.1:5174
+pnpm build:site     # assemble both apps exactly like CI does
+```
+
+Details for the English app (content coverage, review spacing, audio generation)
+live in [apps/english/README.md](apps/english/README.md). The rest of this file
+is about Bunny Math.
+
+---
+
+## 🐰 Bunny Math (apps/math)
 
 A cute little add, subtract, multiply and divide playground for ~8-year-olds,
 built as a **pure front-end** web app. No accounts, no backend, no data leaves
@@ -68,14 +90,14 @@ The worksheet prints as a clean two-column A4 page:
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:5173
+pnpm dev:math     # http://127.0.0.1:5173
 ```
 
 Build and preview the production bundle:
 
 ```bash
-pnpm build        # typecheck + vite build + service worker
-pnpm preview
+pnpm --filter @bunny/math build        # typecheck + vite build + service worker
+pnpm --filter @bunny/math preview
 ```
 
 ## Test it
@@ -135,14 +157,17 @@ remainders are a different lesson.
 ## Layout
 
 ```
-src/
-  game/      pure TypeScript: difficulty, skills, levels, generator, session, scoring, rng
-  components/ Home, Quiz, Equation, Keypad, Strategy, Result, PrintSheet, Mascot, Stars…
-  i18n/      hand-rolled en/zh dictionary
-  lib/       localStorage progress, WebAudio chirps
-  styles/    one hand-written CSS file with design tokens
-scripts/     screenshot + icon tools (system Chrome, no image libraries)
-e2e/         Playwright flows
+apps/
+  math/      the math app  →  /
+    src/game/       difficulty, skills, levels, generator, session, scoring, rng
+    src/components/ Home, Quiz, Equation, Keypad, Strategy, Result, PrintSheet…
+    src/i18n/       hand-rolled en/zh dictionary
+    src/lib/        localStorage progress, WebAudio chirps
+    src/styles/     one hand-written CSS file with design tokens
+    e2e/            Playwright flows
+  english/   the English app  →  /english/   (see apps/english/README.md)
+scripts/     workspace tools: build-site (CI parity), icons, screenshots
+docs/        screenshots used by the READMEs
 ```
 
 ## Privacy

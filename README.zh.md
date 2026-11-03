@@ -1,6 +1,27 @@
-# 🐰 小兔数学 (Bunny Math)
+# 🐰 小兔学习 (Bunny Learn)
 
 [English](README.md) | **中文**
+
+一个给 8 岁左右小朋友用的**纯前端**学习站点，里面有两个应用，一个仓库、一次部署：
+
+| 应用 | 地址 | 内容 |
+| --- | --- | --- |
+| 🐰 小兔数学 | `/` | 加减乘除，18 题一局，可打印练习纸 |
+| 🐰 小兔英语 | `/english/` | 人教版 PEP 词汇 / 自然拼读 / 语法，12 题一课 |
+
+```bash
+pnpm install
+pnpm dev:math       # 数学 → http://127.0.0.1:5173
+pnpm dev:english    # 英语 → http://127.0.0.1:5174
+pnpm build:site     # 本地拼出完整站点（= CI 的产物）
+```
+
+英语应用的细节（内容范围、复习间隔、音频生成）见
+[apps/english/README.md](apps/english/README.md)。下面是小兔数学的说明。
+
+---
+
+## 🐰 小兔数学（apps/math）
 
 给 8 岁左右小朋友的加减乘除练习小游戏，**纯前端**，没有账号、没有后端，数据不出设备。
 
@@ -51,20 +72,20 @@
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:5173
+pnpm dev:math     # http://127.0.0.1:5173
 ```
 
 打包并预览生产版本：
 
 ```bash
-pnpm build        # 类型检查 + vite 打包 + 生成 Service Worker
-pnpm preview
+pnpm --filter @bunny/math build        # 类型检查 + vite 打包 + 生成 Service Worker
+pnpm --filter @bunny/math preview
 ```
 
 ## 测试
 
 ```bash
-pnpm test         # 25 个单元测试：难度模型 + 出题器的各项不变量
+pnpm test         # 25 个单元测试：难度模型 + 出题器的各项不变量（两个应用都跑）
 pnpm e2e          # 4 条 Playwright 流程，直接驱动本机 Chrome
 ```
 
@@ -105,14 +126,17 @@ base 路径由 `VITE_BASE` 决定，工作流会自动区分：
 ## 目录结构
 
 ```
-src/
-  game/      纯 TypeScript：难度、技能、档位、出题器、状态机、统计、随机数
-  components/ Home、Quiz、Equation、Keypad、Strategy、Result、PrintSheet、Mascot、Stars……
-  i18n/      手写的 en/zh 词典（没有引入 i18n 库）
-  lib/       localStorage 进度、WebAudio 音效
-  styles/    一个手写的、带设计 token 的 CSS 文件
-scripts/     截图与图标脚本（用本机 Chrome，不依赖图像库）
-e2e/         Playwright 流程测试
+apps/
+  math/      数学应用  →  /
+    src/game/       纯 TypeScript：难度、技能、档位、出题器、状态机、统计、随机数
+    src/components/ Home、Quiz、Equation、Keypad、Strategy、Result、PrintSheet……
+    src/i18n/       手写的 en/zh 词典（没有引入 i18n 库）
+    src/lib/        localStorage 进度、WebAudio 音效
+    src/styles/     一个手写的、带设计 token 的 CSS 文件
+    e2e/            Playwright 流程测试
+  english/   英语应用  →  /english/   （见 apps/english/README.md）
+scripts/     站点拼装（build-site）、图标、截图
+docs/        README 用到的截图
 ```
 
 ## 隐私

@@ -1,0 +1,14 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ channel: 'chrome' });
+const ctx = await b.newContext({ viewport: { width: 1180, height: 820 }, deviceScaleFactor: 2 });
+const p = await ctx.newPage();
+const errors = [];
+p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
+await p.goto('http://127.0.0.1:5174/', { waitUntil: 'networkidle' });
+await p.evaluate(() => document.fonts.ready);
+await p.waitForTimeout(500);
+await p.screenshot({ path: 'shots/eng-01-home.png', fullPage: true });
+console.log('lessons:', await p.locator('.lesson').count());
+console.log('errors:', JSON.stringify(errors.slice(0, 5)));
+await b.close();

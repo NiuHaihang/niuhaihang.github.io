@@ -11,3 +11,9 @@ playwright-report
 .pnpm-store
 shots
 qa
+
+# edge-tts virtualenv (local audio generation only)
+apps/english/.ttsenv
+
+# local merged build of both apps
+site

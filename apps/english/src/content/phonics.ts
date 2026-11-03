@@ -1,0 +1,121 @@
+import type { SoundSet, Word } from './types';
+
+const p = (en: string, zh: string, emoji: string): Word => ({ id: `ph-${en}`, en, zh, emoji });
+
+/** 自然拼读：先做短元音，PEP 三年级上册的起点。 */
+export const SOUND_SETS: SoundSet[] = [
+  {
+    id: 'short-a',
+    grade: 3,
+    sound: '/æ/',
+    zh: '短元音 a，像“哎”',
+    words: [
+      p('cat', '猫', '🐱'),
+      p('bat', '蝙蝠', '🦇'),
+      p('map', '地图', '🗺️'),
+      p('hat', '帽子', '🎩'),
+      p('bag', '包', '🎒'),
+      p('rat', '老鼠', '🐀'),
+      p('fan', '风扇', '🌀'),
+      p('van', '面包车', '🚐'),
+    ],
+  },
+  {
+    id: 'short-e',
+    grade: 3,
+    sound: '/e/',
+    zh: '短元音 e，像“诶”',
+    words: [
+      p('pen', '钢笔', '🖊️'),
+      p('ten', '十', '🔟'),
+      p('bed', '床', '🛏️'),
+      p('hen', '母鸡', '🐔'),
+      p('red', '红色', '🔴'),
+      p('leg', '腿', '🦵'),
+    ],
+  },
+  {
+    id: 'short-i',
+    grade: 3,
+    sound: '/ɪ/',
+    zh: '短元音 i，像“衣”但更短',
+    words: [
+      p('pig', '猪', '🐷'),
+      p('six', '六', '6️⃣'),
+      p('milk', '牛奶', '🥛'),
+      p('fish', '鱼', '🐟'),
+      p('sit', '坐', '🪑'),
+      p('big', '大的', '🐘'),
+    ],
+  },
+  {
+    id: 'magic-a',
+    grade: 4,
+    sound: '/eɪ/',
+    zh: 'a-e，字母 a 本音',
+    words: [
+      p('cake', '蛋糕', '🍰'),
+      p('name', '名字', '🏷️'),
+      p('plane', '飞机', '✈️'),
+      p('grape', '葡萄', '🍇'),
+      p('face', '脸', '😊'),
+      p('make', '做', '🔨'),
+    ],
+  },
+  {
+    id: 'magic-i',
+    grade: 4,
+    sound: '/aɪ/',
+    zh: 'i-e，字母 i 本音',
+    words: [
+      p('bike', '自行车', '🚲'),
+      p('five', '五', '5️⃣'),
+      p('kite', '风筝', '🪁'),
+      p('rice', '米饭', '🍚'),
+      p('nine', '九', '9️⃣'),
+      p('ride', '骑', '🏇'),
+    ],
+  },
+  {
+    id: 'magic-o',
+    grade: 4,
+    sound: '/əʊ/',
+    zh: 'o-e，字母 o 本音',
+    words: [
+      p('nose', '鼻子', '👃'),
+      p('note', '笔记', '📝'),
+      p('home', '家', '🏠'),
+      p('rope', '绳子', '🪢'),
+      p('rose', '玫瑰', '🌹'),
+      p('hope', '希望', '🌟'),
+    ],
+  },
+  {
+    id: 'ar-or',
+    grade: 5,
+    sound: '/ɑː/',
+    zh: 'ar / or，卷舌音',
+    words: [
+      p('car', '汽车', '🚗'),
+      p('far', '远的', '🔭'),
+      p('star', '星星', '⭐'),
+      p('horse', '马', '🐴'),
+      p('fork', '叉子', '🍴'),
+      p('short', '短的', '📏'),
+    ],
+  },
+  {
+    id: 'ou-ow',
+    grade: 6,
+    sound: '/aʊ/',
+    zh: 'ou / ow，嘴巴张大',
+    words: [
+      p('house', '房子', '🏠'),
+      p('mouse', '老鼠', '🐭'),
+      p('out', '外面', '🚪'),
+      p('cow', '奶牛', '🐄'),
+      p('how', '怎样', '❓'),
+      p('now', '现在', '⏰'),
+    ],
+  },
+];

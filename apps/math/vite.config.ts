@@ -33,6 +33,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,woff2,svg,png}'],
         cleanupOutdatedCaches: true,
         navigateFallback: `${base}index.html`,
+        // The English app lives under /english/ with its own service worker;
+        // this one must not answer those navigations.
+        navigateFallbackDenylist: [/^\/english\//],
       },
       devOptions: { enabled: false },
     }),
