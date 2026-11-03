@@ -1,4 +1,6 @@
-import type { Item } from '../game/types';
+import type { Item, Op } from '../game/types';
+
+const SIGNS: Record<Op, string> = { '+': '+', '-': '−', '×': '×', '÷': '÷' };
 
 interface EquationProps {
   item: Item;
@@ -25,7 +27,7 @@ export function Equation({ item, typed, phase }: EquationProps) {
 
   const aria = [
     blank === 'a' ? '?' : a,
-    op === '+' ? '+' : '−',
+    SIGNS[op],
     blank === 'b' ? '?' : b,
     '=',
     blank === 'answer' ? '?' : total,
@@ -35,7 +37,7 @@ export function Equation({ item, typed, phase }: EquationProps) {
     <div className={`equation equation--${phase}`} role="img" aria-label={aria}>
       {blank === 'a' ? blankNode : <span className="equation__num">{a}</span>}
       <span className="equation__op" aria-hidden="true">
-        {op === '+' ? '+' : '−'}
+        {SIGNS[op]}
       </span>
       {blank === 'b' ? blankNode : <span className="equation__num">{b}</span>}
       <span className="equation__eq" aria-hidden="true">

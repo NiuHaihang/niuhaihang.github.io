@@ -3,31 +3,39 @@ import type { Item } from '../game/types';
 import { useI18n } from '../i18n/I18nProvider';
 import type { StringKey } from '../i18n/strings';
 
-type Visual = 'ten' | 'line' | 'part' | 'column';
+type Visual = 'ten' | 'line' | 'part' | 'column' | 'array';
+
+/** A dot array says "rows of" better than words — but only while it fits. */
+const ARRAY_LIMIT = 42;
 
 function pickVisual(item: Item): Visual {
+  if (item.op === '×' || item.op === '÷') {
+    if (item.blank !== 'answer') return 'part';
+    // Count the dots the picture would need: a ÷ b draws a dots, not the quotient.
+    const dots = item.op === '×' ? item.a * item.b : item.a;
+    return dots <= ARRAY_LIMIT ? 'array' : 'part';
+  }
   if (item.blank !== 'answer') return 'part';
   if (item.op === '+' && item.a < 10 && item.b < 10) return 'ten';
   if (item.op === '-' && item.b < 10) return 'line';
   return 'column';
 }
 
+function titleKeyFor(item: Item, visual: Visual): StringKey {
+  if (visual === 'ten') return 'how.makeTen';
+  if (visual === 'line') return 'how.countBack';
+  if (visual === 'part') return 'how.partPart';
+  if (visual === 'array') return item.op === '×' ? 'how.times' : 'how.share';
+  if (item.op === '+' && carries(item)) return 'how.carry';
+  if (item.op === '-' && borrows(item)) return 'how.borrow';
+  return 'how.split';
+}
+
 /** Compact, picture-first explanation. One idea per panel, no paragraphs. */
 export function Strategy({ item }: { item: Item }) {
   const { t } = useI18n();
   const visual = pickVisual(item);
-  const titleKey: StringKey =
-    visual === 'ten'
-      ? 'how.makeTen'
-      : visual === 'line'
-        ? 'how.countBack'
-        : visual === 'part'
-          ? 'how.partPart'
-          : item.op === '+' && carries(item)
-            ? 'how.carry'
-            : item.op === '-' && borrows(item)
-              ? 'how.borrow'
-              : 'how.split';
+  const titleKey = titleKeyFor(item, visual);
 
   return (
     <div className="strategy" data-visual={visual}>
@@ -38,6 +46,7 @@ export function Strategy({ item }: { item: Item }) {
         {visual === 'line' && <NumberLine a={item.a} b={item.b} />}
         {visual === 'part' && <PartPart item={item} />}
         {visual === 'column' && <Column item={item} />}
+        {visual === 'array' && <ArrayDots item={item} />}
       </div>
       <p className="strategy__caption">{captionFor(item, visual)}</p>
     </div>
@@ -99,11 +108,48 @@ function captionFor(item: Item, visual: Visual): ReactNode {
     return <>{steps.map((s, i) => (i === 0 ? s : <span key={i}>{s}</span>))}</>;
   }
 
+  if (visual === 'array') {
+    return (
+      <>
+        <Num>{a}</Num> {op === '×' ? '×' : '÷'} <Num>{b}</Num> = <Num>{total}</Num>
+      </>
+    );
+  }
+
   if (visual === 'part') {
     if (op === '+') {
       return (
         <>
           <Num>{total}</Num> − <Num>{a}</Num> = <Num>{b}</Num>
+        </>
+      );
+    }
+    if (op === '×') {
+      if (item.blank === 'a') {
+        return (
+          <>
+            <Num>{total}</Num> ÷ <Num>{b}</Num> = <Num>{a}</Num>
+          </>
+        );
+      }
+      if (item.blank === 'b') {
+        return (
+          <>
+            <Num>{total}</Num> ÷ <Num>{a}</Num> = <Num>{b}</Num>
+          </>
+        );
+      }
+      return (
+        <>
+          <Num>{a}</Num> × <Num>{b}</Num> = <Num>{total}</Num>
+        </>
+      );
+    }
+    if (op === '÷') {
+      // The multiplication fact is true whichever slot was empty.
+      return (
+        <>
+          <Num>{b}</Num> × <Num>{total}</Num> = <Num>{a}</Num>
         </>
       );
     }
@@ -263,17 +309,63 @@ function NumberLine({ a, b }: { a: number; b: number }) {
   );
 }
 
+/* ------------------------------------------------------------------ dot array */
+
+function ArrayDots({ item }: { item: Item }) {
+  const { op, a, b, total } = item;
+  // Multiplication is commutative: draw the flat version, 2 rows of 9 beats 9 rows of 2.
+  const rows = op === '×' ? Math.min(a, b) : b;
+  const cols = op === '×' ? Math.max(a, b) : total;
+  // Few dots should grow, many dots should shrink — keep the block about 200px.
+  const dot = Math.round(Math.max(9, Math.min(24, 200 / cols, 210 / rows)));
+
+  return (
+    <div
+      className="array"
+      role="img"
+      aria-label={`${rows} × ${cols}`}
+      style={{ ['--dot' as string]: `${dot}px` }}
+    >
+      {Array.from({ length: rows }, (_, r) => (
+        <div className="array__row" key={r}>
+          {Array.from({ length: cols }, (_, c) => (
+            <span className="array__dot" key={c} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------ part-part-whole */
 
+interface Layout {
+  whole: number;
+  parts: [number, number];
+  blankWhole: boolean;
+  blankParts: [boolean, boolean];
+}
+
+/** Which number sits in the whole, which two in the parts — per operation. */
+function partLayout(item: Item): Layout {
+  const { op, a, b, total, blank } = item;
+  if (op === '-') {
+    return { whole: a, parts: [total, b], blankWhole: blank === 'a', blankParts: [false, blank === 'b'] };
+  }
+  if (op === '÷') {
+    // Dividend on top; divisor and quotient underneath.
+    return { whole: a, parts: [b, total], blankWhole: blank === 'a', blankParts: [blank === 'b', blank === 'answer'] };
+  }
+  // Addition and multiplication: the total is the whole.
+  return { whole: total, parts: [a, b], blankWhole: false, blankParts: [blank === 'a', blank === 'b'] };
+}
+
 function PartPart({ item }: { item: Item }) {
-  const whole = item.op === '-' ? item.a : item.total;
-  const partOne = item.op === '-' ? item.total : item.a;
-  const partTwo = item.b;
-  const blank = item.blank;
+  const { whole, parts, blankWhole, blankParts } = partLayout(item);
 
   return (
     <div className="ppw">
-      <div className={`ppw__node ppw__node--whole ${blank === 'a' && item.op === '-' ? 'is-blank' : ''}`}>
+      <div className={`ppw__node ppw__node--whole ${blankWhole ? 'is-blank' : ''}`}>
         <span className="ppw__value">{whole}</span>
       </div>
       <div className="ppw__legs" aria-hidden="true">
@@ -281,11 +373,11 @@ function PartPart({ item }: { item: Item }) {
         <span />
       </div>
       <div className="ppw__parts">
-        <div className={`ppw__node ${blank === 'a' && item.op === '+' ? 'is-blank' : ''}`}>
-          <span className="ppw__value">{partOne}</span>
+        <div className={`ppw__node ${blankParts[0] ? 'is-blank' : ''}`}>
+          <span className="ppw__value">{parts[0]}</span>
         </div>
-        <div className={`ppw__node ${blank === 'b' ? 'is-blank' : ''}`}>
-          <span className="ppw__value">{partTwo}</span>
+        <div className={`ppw__node ${blankParts[1] ? 'is-blank' : ''}`}>
+          <span className="ppw__value">{parts[1]}</span>
         </div>
       </div>
     </div>

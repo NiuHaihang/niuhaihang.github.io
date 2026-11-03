@@ -1,8 +1,8 @@
 import { difficultyOf } from './difficulty';
-import { levelDef, levelForSkill } from './levels';
+import { levelDef, levelForSkill, levelSkills } from './levels';
 import { makeRng, type Rng } from './rng';
 import { SKILLS } from './skills';
-import type { Item, LevelId, RawItem, Round, SkillId } from './types';
+import type { Item, LevelId, Op, RawItem, Round, SkillId, Track } from './types';
 
 const ROUND_SIZE = 18;
 const PRACTICE_SIZE = 5;
@@ -10,6 +10,8 @@ const PRACTICE_SIZE = 5;
 interface SkillStat {
   id: SkillId;
   mean: number;
+  /** Which operators this skill can produce — used to guarantee coverage. */
+  ops: Op[];
 }
 
 interface LevelShape {
@@ -18,38 +20,45 @@ interface LevelShape {
   hi: number;
 }
 
-const shapeCache = new Map<LevelId, LevelShape>();
+const shapeCache = new Map<string, LevelShape>();
 
-function shapeOf(level: LevelId): LevelShape {
-  const cached = shapeCache.get(level);
+function shapeOf(track: Track, level: LevelId): LevelShape {
+  const key = `${track}:${level}`;
+  const cached = shapeCache.get(key);
   if (cached) return cached;
 
-  const def = levelDef(level);
-  const rng = makeRng(0x9e3779b9 ^ def.skills.length);
+  const skills = levelSkills(level, track);
+  const rng = makeRng(0x9e3779b9 ^ skills.length ^ (track === 'all4' ? 0x51ed : 0));
   const perSkill: SkillStat[] = [];
   const all: number[] = [];
 
-  for (const id of def.skills) {
+  for (const id of skills) {
     const values: number[] = [];
+    const ops = new Set<Op>();
     for (let i = 0; i < 240; i++) {
       const raw = SKILLS[id].sample(rng);
       const d = difficultyOf(raw.a, raw.b, raw.op, raw.blank);
       values.push(d);
       all.push(d);
+      ops.add(raw.op);
     }
-    perSkill.push({ id, mean: values.reduce((s, n) => s + n, 0) / values.length });
+    perSkill.push({
+      id,
+      mean: values.reduce((s, n) => s + n, 0) / values.length,
+      ops: [...ops],
+    });
   }
 
   all.sort((x, y) => x - y);
   const at = (p: number) => all[Math.min(all.length - 1, Math.max(0, Math.floor(all.length * p)))] ?? 0;
-  // Start the ramp at the level's easy quartile, not its easiest item: a warm-up
-  // should be gentle, not babyish ("1 + 5" for an eight-year-old).
   const shape: LevelShape = { skills: perSkill, lo: at(0.22), hi: at(0.94) };
-  shapeCache.set(level, shape);
+  shapeCache.set(key, shape);
   return shape;
 }
 
 function totalOf(raw: RawItem): number {
+  if (raw.op === '×') return raw.a * raw.b;
+  if (raw.op === '÷') return raw.a / raw.b;
   return raw.op === '+' ? raw.a + raw.b : raw.a - raw.b;
 }
 
@@ -73,10 +82,12 @@ function makeItem(skill: SkillId, raw: RawItem, index: number): Item {
   };
 }
 
-function accept(item: Item): boolean {
+export function accept(item: Item): boolean {
   if (!Number.isInteger(item.answer) || item.answer < 2 || item.answer > 999) return false;
-  if (item.total < 0) return false;
+  if (!Number.isInteger(item.total) || item.total < 0) return false;
   if (item.op === '-' && item.a === item.b) return false;
+  // Division must come out even; a remainder is a different lesson.
+  if (item.op === '÷' && item.a % item.b !== 0) return false;
   return true;
 }
 
@@ -86,7 +97,12 @@ function keyOf(item: Item): string {
     const hi = Math.max(item.a, item.b);
     return `+${lo}:${hi}:${item.blank}`;
   }
-  return `-${item.a}:${item.b}:${item.blank}`;
+  if (item.op === '×') {
+    const lo = Math.min(item.a, item.b);
+    const hi = Math.max(item.a, item.b);
+    return `×${lo}:${hi}:${item.blank}`;
+  }
+  return `${item.op}-${item.a}:${item.b}:${item.blank}`;
 }
 
 function wouldTriple(items: Item[], skill: SkillId): boolean {
@@ -134,36 +150,54 @@ function ease(t: number): number {
 }
 
 interface BuildOptions {
+  track: Track;
   level: LevelId;
   seed: number;
   count: number;
   skills: SkillId[];
+  /** 0 for practice: practising an easy skill is the whole point. */
   floor: number;
+  /** Operators that must appear at least once (all-four rounds only). */
+  requiredOps?: Op[];
 }
 
-function buildRound({ level, seed, count, skills, floor }: BuildOptions): Round {
+function buildRound({
+  track,
+  level,
+  seed,
+  count,
+  skills,
+  floor,
+  requiredOps = [],
+}: BuildOptions): Round {
   const rng = makeRng(seed);
-  const shape = shapeOf(level);
-  const lo = Math.max(shape.lo, floor);
-  // A single-skill round (practice) is *meant* to repeat the skill.
-  const repeatable = skills.length <= 1;
+  const shape = shapeOf(track, level);
   const stats = shape.skills.filter((s) => skills.includes(s.id));
   const usable = stats.length > 0 ? stats : shape.skills;
+  const lo = Math.max(shape.lo, floor);
+  const hi = Math.max(lo + 4, shape.hi);
+  const repeatable = skills.length <= 1;
   const items: Item[] = [];
 
   for (let i = 0; i < count; i++) {
     const progress = count === 1 ? 0.4 : i / (count - 1);
     const jitter = (rng() - 0.5) * 7;
-    const target = Math.max(4, Math.min(100, lo + (shape.hi - lo) * ease(progress) + jitter));
+    const target = Math.max(4, Math.min(100, lo + (hi - lo) * ease(progress) + jitter));
+
+    // Reserve the last free slots for operators the round has not shown yet.
+    const missing = requiredOps.filter((op) => !items.some((it) => it.op === op));
+    const forceOp = missing.length > 0 && count - i <= missing.length ? missing[0]! : null;
+    const pool = forceOp ? usable.filter((stat) => stat.ops.includes(forceOp)) : usable;
 
     let best: { item: Item; score: number } | null = null;
 
     for (let tries = 0; tries < 40; tries++) {
-      const skill = pickSkill(rng, target, usable);
+      const skill = pickSkill(rng, target, pool.length > 0 ? pool : usable);
       if (!repeatable && wouldTriple(items, skill)) continue;
       const raw = SKILLS[skill].sample(rng);
       const item = makeItem(skill, raw, i);
       if (!accept(item)) continue;
+      if (forceOp && item.op !== forceOp) continue;
       if (item.difficulty < floor) continue;
 
       const penalty = varietyPenalty(items, item);
@@ -180,9 +214,9 @@ function buildRound({ level, seed, count, skills, floor }: BuildOptions): Round 
       // Relaxed fallback: any accepted, still-unique item from the allowed skills.
       for (let tries = 0; tries < 200 && !best; tries++) {
         const skill = usable[tries % usable.length]!.id;
-        if (!repeatable && wouldTriple(items, skill)) continue;
         const item = makeItem(skill, SKILLS[skill].sample(rng), i);
         if (!accept(item)) continue;
+        if (forceOp && item.op !== forceOp) continue;
         if (item.difficulty < floor) continue;
         if (items.some((prev) => keyOf(prev) === keyOf(item))) continue;
         best = { item, score: 0 };
@@ -191,17 +225,35 @@ function buildRound({ level, seed, count, skills, floor }: BuildOptions): Round 
     }
   }
 
-  return { items, level, seed };
+  return { items, level, track, seed };
 }
 
-export function generateRound(level: LevelId, seed: number, count = ROUND_SIZE): Round {
-  const def = levelDef(level);
-  return buildRound({ level, seed, count, skills: def.skills, floor: def.floor });
+export function generateRound(
+  track: Track,
+  level: LevelId,
+  seed: number,
+  count = ROUND_SIZE,
+): Round {
+  return buildRound({
+    track,
+    level,
+    seed,
+    count,
+    skills: levelSkills(level, track),
+    floor: levelDef(level).floor,
+    requiredOps: track === 'all4' ? ['×', '÷'] : [],
+  });
+}
+
+export function trackForSkill(skill: SkillId): Track {
+  const level = levelForSkill(skill);
+  return levelSkills(level, 'addsub').includes(skill) ? 'addsub' : 'all4';
 }
 
 export function generatePractice(skill: SkillId, seed: number, count = PRACTICE_SIZE): Round {
   const level = levelForSkill(skill);
   return buildRound({
+    track: trackForSkill(skill),
     level,
     seed,
     count: Math.min(count, PRACTICE_SIZE + 2),

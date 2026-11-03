@@ -1,4 +1,4 @@
-import type { LevelId, SkillId } from './types';
+import type { LevelId, SkillId, Track } from './types';
 
 export type Accent = 'mint' | 'blush' | 'lilac' | 'butter';
 
@@ -62,6 +62,17 @@ export const LEVELS: Level[] = [
   },
 ];
 
+/**
+ * What "+ − × ÷" adds on top of each garden. The gardens stay the same ladder;
+ * the times tables are layered in at the tier where they are taught.
+ */
+const TIMES_SKILLS: Record<LevelId, SkillId[]> = {
+  sprout: ['mulSmall', 'divSmall'],
+  blossom: ['mulTable', 'divTable'],
+  sparkle: ['mulTable', 'divTable', 'missingTimes'],
+  starlight: ['mul2d1d', 'div2d1d', 'missingTimes'],
+};
+
 const BY_ID = new Map(LEVELS.map((l) => [l.id, l]));
 
 export function levelDef(id: LevelId): Level {
@@ -70,6 +81,15 @@ export function levelDef(id: LevelId): Level {
   return level;
 }
 
+/** The skills a round of this garden and quiz set can draw from. */
+export function levelSkills(level: LevelId, track: Track): SkillId[] {
+  const { skills } = levelDef(level);
+  return track === 'all4' ? [...skills, ...TIMES_SKILLS[level]] : skills;
+}
+
 export function levelForSkill(skill: SkillId): LevelId {
-  return LEVELS.find((l) => l.skills.includes(skill))?.id ?? 'blossom';
+  const found = LEVELS.find(
+    (l) => l.skills.includes(skill) || TIMES_SKILLS[l.id].includes(skill),
+  );
+  return found?.id ?? 'blossom';
 }

@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { Mascot } from './Mascot';
 import { Stars } from './Stars';
 import { LEVELS } from '../game/levels';
-import type { LevelId } from '../game/types';
+import { TRACKS, type LevelId, type Track } from '../game/types';
 import type { Progress } from '../lib/storage';
-import { streakLength } from '../lib/storage';
+import { slotKey, streakLength } from '../lib/storage';
 import { useI18n } from '../i18n/I18nProvider';
 import type { StringKey } from '../i18n/strings';
 
 interface HomeProps {
   progress: Progress;
   selected: LevelId;
+  track: Track;
+  onSetTrack: (track: Track) => void;
   onSetLevel: (level: LevelId) => void;
   onStart: () => void;
   onPrint: () => void;
@@ -26,9 +28,16 @@ const FLOWERS: Record<LevelId, string> = {
   starlight: '🌙',
 };
 
+const OPS: Record<Track, string> = {
+  addsub: '+ −',
+  all4: '+ − × ÷',
+};
+
 export function Home({
   progress,
   selected,
+  track,
+  onSetTrack,
   onSetLevel,
   onStart,
   onPrint,
@@ -102,12 +111,44 @@ export function Home({
         </div>
       </section>
 
+      <section className="home__tracks">
+        <h2 className="section-title">{t('home.quizSet')}</h2>
+        <div className="tracks" role="radiogroup" aria-label={t('home.quizSet')}>
+          {TRACKS.map((id) => {
+            const active = id === track;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                className={`track track--${id} ${active ? 'is-selected' : ''}`}
+                onClick={() => onSetTrack(id)}
+              >
+                <span className="track__ops" aria-hidden="true">
+                  {OPS[id]}
+                </span>
+                <span className="track__text">
+                  <span className="track__name">{t(id === 'addsub' ? 'track.addsub' : 'track.all4')}</span>
+                  <span className="track__sub">
+                    {t(id === 'addsub' ? 'track.addsub.sub' : 'track.all4.sub')}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="home__levels">
         <h2 className="section-title">{t('home.pick')}</h2>
         <div className="levels" role="radiogroup" aria-label={t('home.pick')}>
           {LEVELS.map((level) => {
             const active = level.id === selected;
-            const best = progress.best[level.id];
+            const key = slotKey(track, level.id);
+            const best = progress.best[key] ?? 0;
+            const stars = progress.stars[key] ?? 0;
+            const subKey = (track === 'all4' ? `level.${level.id}.sub4` : `level.${level.id}.sub`) as StringKey;
             return (
               <button
                 key={level.id}
@@ -121,9 +162,9 @@ export function Home({
                   {FLOWERS[level.id]}
                 </span>
                 <span className="level__name">{t(`level.${level.id}` as StringKey)}</span>
-                <span className="level__sub">{t(`level.${level.id}.sub` as StringKey)}</span>
+                <span className="level__sub">{t(subKey)}</span>
                 <span className="level__stars">
-                  <Stars count={progress.stars[level.id]} size={16} />
+                  <Stars count={stars} size={16} />
                 </span>
                 {best > 0 ? <span className="level__best">{best}%</span> : null}
               </button>

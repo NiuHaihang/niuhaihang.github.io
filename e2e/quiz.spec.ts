@@ -1,16 +1,41 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/** Read the equation on screen and work out the missing number. */
-async function readQuestion(page: Page) {
-  const label = (await page.locator('.equation').getAttribute('aria-label')) ?? '';
+type Sign = '+' | '-' | '×' | '÷';
+
+function parseQuestion(label: string) {
   const tokens = label.split(' ').filter(Boolean);
-  const op = tokens.includes('+') ? '+' : '-';
+  // The UI prints U+2212 for minus, so accept both dashes.
+  const op: Sign =
+    (['×', '÷', '+'] as Sign[]).find((s) => tokens.includes(s)) ??
+    (tokens.includes('−') || tokens.includes('-') ? '-' : '+');
   const eq = tokens.indexOf('=');
   const [a, , b] = tokens.slice(0, eq);
   const right = tokens[eq + 1]!;
-  if (a === '?') return op === '+' ? Number(right) - Number(b) : Number(right) + Number(b);
-  if (b === '?') return op === '+' ? Number(right) - Number(a) : Number(a) - Number(right);
-  return op === '+' ? Number(a) + Number(b) : Number(a) - Number(b);
+  return { op, a, b, right };
+}
+
+/** Read the equation on screen and work out the missing number. */
+async function readQuestion(page: Page) {
+  const label = (await page.locator('.equation').getAttribute('aria-label')) ?? '';
+  const { op, a, b, right } = parseQuestion(label);
+  if (a === '?') {
+    if (op === '+') return Number(right) - Number(b);
+    if (op === '-') return Number(right) + Number(b);
+    return op === '×' ? Number(right) / Number(b) : Number(right) * Number(b);
+  }
+  if (b === '?') {
+    if (op === '+') return Number(right) - Number(a);
+    if (op === '-') return Number(a) - Number(right);
+    return op === '×' ? Number(right) / Number(a) : Number(a) / Number(right);
+  }
+  if (op === '+') return Number(a) + Number(b);
+  if (op === '-') return Number(a) - Number(b);
+  return op === '×' ? Number(a) * Number(b) : Number(a) / Number(b);
+}
+
+async function readOp(page: Page): Promise<Sign> {
+  const label = (await page.locator('.equation').getAttribute('aria-label')) ?? '';
+  return parseQuestion(label).op;
 }
 
 async function typeNumber(page: Page, value: number) {
@@ -97,4 +122,39 @@ test('the printable worksheet has 24 questions and an answer key', async ({ page
 
   await page.getByRole('button', { name: 'Show answers' }).click();
   await expect(page.locator('.print-item__answer')).toHaveCount(24);
+});
+
+test('the all-four set really mixes in times and division', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('radio', { name: /All four/ }).click();
+  await page.getByRole('button', { name: /Start/ }).click();
+  await expect(page.locator('.equation')).toBeVisible();
+
+  const seen = new Set<Sign>();
+  for (let i = 1; i <= 18; i++) {
+    seen.add(await readOp(page));
+    await typeNumber(page, await readQuestion(page));
+    await page.locator('.key--go').click();
+    if (i < 18) await expect(page.locator('.quiz__count')).toContainText(`${i + 1} of 18`);
+  }
+
+  expect(seen.has('×')).toBe(true);
+  expect(seen.has('÷')).toBe(true);
+  await expect(page.locator('.result')).toBeVisible({ timeout: 10_000 });
+});
+
+test('the add-only set never shows times or division', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('radio', { name: /Add & take away/ }).click();
+  await page.getByRole('button', { name: /Start/ }).click();
+
+  const seen = new Set<Sign>();
+  for (let i = 1; i <= 18; i++) {
+    seen.add(await readOp(page));
+    await typeNumber(page, await readQuestion(page));
+    await page.locator('.key--go').click();
+    if (i < 18) await expect(page.locator('.quiz__count')).toContainText(`${i + 1} of 18`);
+  }
+
+  expect([...seen].every((op) => op === '+' || op === '-')).toBe(true);
 });

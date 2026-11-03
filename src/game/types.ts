@@ -1,4 +1,13 @@
-export type Op = '+' | '-';
+export type Op = '+' | '-' | '×' | '÷';
+
+/**
+ * Which quiz set the child picked on the home screen:
+ *  - `addsub` — addition and subtraction only (the original game);
+ *  - `all4`   — the same gardens plus multiplication and division.
+ */
+export type Track = 'addsub' | 'all4';
+
+export const TRACKS: Track[] = ['addsub', 'all4'];
 
 /** Which slot of the equation the child has to fill in. */
 export type Blank = 'answer' | 'a' | 'b';
@@ -18,7 +27,14 @@ export type SkillId =
   | 'sub2d2dBorrow'
   | 'missing'
   | 'stretch3d'
-  | 'stretch100';
+  | 'stretch100'
+  | 'mulSmall'
+  | 'divSmall'
+  | 'mulTable'
+  | 'divTable'
+  | 'mul2d1d'
+  | 'div2d1d'
+  | 'missingTimes';
 
 export type LevelId = 'sprout' | 'blossom' | 'sparkle' | 'starlight';
 
@@ -49,6 +65,7 @@ export interface AnswerRecord {
 export interface Round {
   items: Item[];
   level: LevelId;
+  track: Track;
   seed: number;
 }
 

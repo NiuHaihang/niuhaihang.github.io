@@ -6,8 +6,9 @@ import { defineConfig } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  // A full 18-question round takes ~45 s; give it room when workers compete.
+  timeout: 180_000,
   fullyParallel: true,
-  timeout: 90_000,
   expect: { timeout: 8_000 },
   reporter: [['list']],
   use: {
@@ -17,7 +18,7 @@ export default defineConfig({
     viewport: { width: 1180, height: 820 },
   },
   webServer: {
-    command: 'pnpm dev --port 5173 --strictPort',
+    command: 'pnpm dev --port 5173 --strictPort --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

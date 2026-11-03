@@ -6,16 +6,25 @@ import { Result } from './components/Result';
 import { randomSeed } from './game/rng';
 import { summarize } from './game/scoring';
 import { initialState, reducer } from './game/session';
-import type { LevelId } from './game/types';
+import type { LevelId, Track } from './game/types';
 import { I18nProvider } from './i18n/I18nProvider';
 import type { Lang } from './i18n/strings';
 import { sound } from './lib/sound';
-import { clearProgress, dayKey, defaultProgress, loadProgress, saveProgress } from './lib/storage';
+import {
+  clearProgress,
+  dayKey,
+  defaultProgress,
+  loadProgress,
+  saveProgress,
+  slotKey,
+} from './lib/storage';
 import type { Progress } from './lib/storage';
 
 export function App() {
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
-  const [state, dispatch] = useReducer(reducer, progress.level, initialState);
+  const [state, dispatch] = useReducer(reducer, progress, (p) =>
+    initialState(p.level, p.track),
+  );
   const [printing, setPrinting] = useState(false);
   const recorded = useRef<string | null>(null);
 
@@ -41,25 +50,39 @@ export function App() {
     recorded.current = key;
 
     const summary = summarize(state.round, state.answers, state.startedAt, state.finishedAt);
-    const level = state.level;
+    const slot = slotKey(state.track, state.level);
     const today = dayKey(new Date());
 
     setProgress((prev) => ({
       ...prev,
-      stars: { ...prev.stars, [level]: Math.max(prev.stars[level], summary.stars) },
+      stars: { ...prev.stars, [slot]: Math.max(prev.stars[slot] ?? 0, summary.stars) },
       best: {
         ...prev.best,
-        [level]: Math.max(prev.best[level], Math.round(summary.accuracy * 100)),
+        [slot]: Math.max(prev.best[slot] ?? 0, Math.round(summary.accuracy * 100)),
       },
       days: prev.days.includes(today) ? prev.days : [...prev.days, today],
       rounds: prev.rounds + 1,
       correct: prev.correct + summary.correct,
     }));
-  }, [state.screen, state.mode, state.round, state.finishedAt, state.answers, state.startedAt, state.level]);
+  }, [
+    state.screen,
+    state.mode,
+    state.round,
+    state.finishedAt,
+    state.answers,
+    state.startedAt,
+    state.level,
+    state.track,
+  ]);
 
   const setLevel = (level: LevelId) => {
     dispatch({ type: 'setLevel', level });
     setProgress((prev) => ({ ...prev, level }));
+  };
+
+  const setTrack = (track: Track) => {
+    dispatch({ type: 'setTrack', track });
+    setProgress((prev) => ({ ...prev, track }));
   };
 
   const setLang = (lang: Lang) => setProgress((prev) => ({ ...prev, lang }));
@@ -74,11 +97,13 @@ export function App() {
         </div>
 
         {printing ? (
-          <PrintSheet level={state.level} onClose={() => setPrinting(false)} />
+          <PrintSheet level={state.level} track={state.track} onClose={() => setPrinting(false)} />
         ) : state.screen === 'home' ? (
           <Home
             progress={progress}
             selected={state.level}
+            track={state.track}
+            onSetTrack={setTrack}
             onSetLevel={setLevel}
             onStart={() => dispatch({ type: 'start', level: state.level, seed: randomSeed(), now: Date.now() })}
             onPrint={() => setPrinting(true)}
@@ -90,6 +115,7 @@ export function App() {
               setProgress(fresh);
               recorded.current = null;
               dispatch({ type: 'setLevel', level: fresh.level });
+              dispatch({ type: 'setTrack', track: fresh.track });
               dispatch({ type: 'home' });
             }}
           />

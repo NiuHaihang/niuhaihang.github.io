@@ -1,36 +1,39 @@
 import { useMemo, useState } from 'react';
 import { generateRound } from '../game/generator';
 import { randomSeed } from '../game/rng';
-import type { Item, LevelId } from '../game/types';
+import type { Item, LevelId, Track } from '../game/types';
 import { useI18n } from '../i18n/I18nProvider';
 import type { StringKey } from '../i18n/strings';
 
 interface PrintSheetProps {
   level: LevelId;
+  track: Track;
   onClose: () => void;
 }
 
 const SHEET_SIZE = 24;
 
+const SIGNS: Record<Item['op'], string> = { '+': '+', '-': '−', '×': '×', '÷': '÷' };
+
 function prompt(item: Item): string {
-  const sign = item.op === '+' ? '+' : '−';
+  const sign = SIGNS[item.op];
   const left = item.blank === 'a' ? '____' : String(item.a);
   const right = item.blank === 'b' ? '____' : String(item.b);
   const result = item.blank === 'answer' ? '____' : String(item.total);
   return `${left} ${sign} ${right} = ${result}`;
 }
 
-export function PrintSheet({ level, onClose }: PrintSheetProps) {
+export function PrintSheet({ level, track, onClose }: PrintSheetProps) {
   const { t } = useI18n();
   const [seed, setSeed] = useState(() => randomSeed());
   const [answers, setAnswers] = useState(false);
 
   const items = useMemo(() => {
     // A printed sheet should read easy → hard, not in generation order.
-    return generateRound(level, seed, SHEET_SIZE).items
+    return generateRound(track, level, seed, SHEET_SIZE).items
       .slice()
       .sort((x, y) => x.difficulty - y.difficulty || x.answer - y.answer);
-  }, [level, seed]);
+  }, [level, seed, track]);
 
   return (
     <div className="screen print-screen">
@@ -51,7 +54,7 @@ export function PrintSheet({ level, onClose }: PrintSheetProps) {
 
       <article className="print-sheet">
         <header className="print-sheet__head">
-          <h1>{t('print.title')}</h1>
+          <h1>{t(track === 'all4' ? 'print.titleAll4' : 'print.title')}</h1>
           <div className="print-sheet__meta">
             <span>
               {t('print.name')} <i className="print-line" />
@@ -75,7 +78,7 @@ export function PrintSheet({ level, onClose }: PrintSheetProps) {
 
         <footer className="print-sheet__foot">
           <span>🌸 {t('app.name')}</span>
-          <span>{t(`level.${level}.sub` as StringKey)}</span>
+          <span>{t((track === 'all4' ? `level.${level}.sub4` : `level.${level}.sub`) as StringKey)}</span>
         </footer>
       </article>
     </div>

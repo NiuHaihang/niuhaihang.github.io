@@ -196,6 +196,85 @@ export const SKILLS: Record<SkillId, SkillDef> = {
       return { a: 100, b, op: '-', blank: 'answer' };
     }),
   },
+
+  /* ------------------------------------------------------------ times tables */
+
+  mulSmall: {
+    id: 'mulSmall',
+    sample: attempt((rng) => {
+      // 2, 5 and 10 tables: the ones children meet first.
+      const a = [2, 2, 3, 5, 5, 10][randInt(rng, 0, 5)] ?? 2;
+      const b = randInt(rng, 2, 5);
+      return { a, b, op: '×', blank: 'answer' };
+    }),
+  },
+
+  divSmall: {
+    id: 'divSmall',
+    sample: attempt((rng) => {
+      const b = [2, 2, 3, 5][randInt(rng, 0, 3)] ?? 2;
+      const q = randInt(rng, 2, 5);
+      return { a: b * q, b, op: '÷', blank: 'answer' };
+    }),
+  },
+
+  mulTable: {
+    id: 'mulTable',
+    sample: attempt((rng) => {
+      // 2..9 × 2..9, never ×1 (a reflex, not a fact).
+      const a = randInt(rng, 2, 9);
+      const b = randInt(rng, 2, 9);
+      return { a, b, op: '×', blank: 'answer' };
+    }),
+  },
+
+  divTable: {
+    id: 'divTable',
+    sample: attempt((rng) => {
+      const b = randInt(rng, 2, 9);
+      const q = randInt(rng, 2, 9);
+      return { a: b * q, b, op: '÷', blank: 'answer' };
+    }),
+  },
+
+  mul2d1d: {
+    id: 'mul2d1d',
+    sample: attempt((rng) => {
+      // 23 × 3 style: a two-digit number by a small single digit.
+      const a = randInt(rng, 12, 49);
+      const b = randInt(rng, 2, 4);
+      if (a % 10 === 0) return null;
+      return { a, b, op: '×', blank: 'answer' };
+    }),
+  },
+
+  div2d1d: {
+    id: 'div2d1d',
+    sample: attempt((rng) => {
+      // 96 ÷ 8 = 12 style: a two-digit dividend, a 1-digit divisor.
+      const b = randInt(rng, 3, 9);
+      const q = randInt(rng, 4, 12);
+      const a = b * q;
+      if (a > 99 || a < 24) return null;
+      return { a, b, op: '÷', blank: 'answer' };
+    }),
+  },
+
+  missingTimes: {
+    id: 'missingTimes',
+    sample: attempt((rng) => {
+      // The inverse of a table fact, with one factor hidden.
+      const family = randInt(rng, 0, 3);
+      const f1 = randInt(rng, 2, 9);
+      const f2 = randInt(rng, 2, 9);
+      // ×: ? × f2 = product  /  f1 × ? = product
+      if (family === 0) return { a: f1, b: f2, op: '×', blank: 'a' };
+      if (family === 1) return { a: f1, b: f2, op: '×', blank: 'b' };
+      // ÷: dividend ÷ ? = f2  /  ? ÷ f2 = f1
+      if (family === 2) return { a: f1 * f2, b: f2, op: '÷', blank: 'b' };
+      return { a: f1 * f2, b: f2, op: '÷', blank: 'a' };
+    }),
+  },
 };
 
 export const SKILL_IDS = Object.keys(SKILLS) as SkillId[];

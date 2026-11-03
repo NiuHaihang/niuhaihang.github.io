@@ -18,6 +18,8 @@ interface QuizProps {
 
 function nudgeKey(item: Item): StringKey {
   if (item.blank !== 'answer') return 'hint.cover';
+  if (item.op === '×') return 'hint.times';
+  if (item.op === '÷') return 'hint.share';
   if (item.op === '+' && item.a < 10 && item.b < 10) return 'hint.countOn';
   if (item.op === '+') return 'hint.tensFirst';
   return 'hint.countBack';

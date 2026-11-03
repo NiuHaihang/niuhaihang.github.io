@@ -1,6 +1,6 @@
 import { generatePractice, generateRound } from './generator';
 import { levelForSkill } from './levels';
-import type { AnswerRecord, LevelId, Round, SkillId } from './types';
+import type { AnswerRecord, LevelId, Round, SkillId, Track } from './types';
 
 export type Screen = 'home' | 'quiz' | 'result';
 export type Mode = 'round' | 'practice';
@@ -8,6 +8,8 @@ export type Phase = 'input' | 'correct' | 'wrong';
 
 export interface SessionState {
   screen: Screen;
+  /** The quiz set picked on the home screen. */
+  track: Track;
   level: LevelId;
   mode: Mode;
   practiceSkill: SkillId | null;
@@ -22,9 +24,10 @@ export interface SessionState {
   finishedAt: number | null;
 }
 
-export function initialState(level: LevelId): SessionState {
+export function initialState(level: LevelId, track: Track = 'addsub'): SessionState {
   return {
     screen: 'home',
+    track,
     level,
     mode: 'round',
     practiceSkill: null,
@@ -50,14 +53,15 @@ export type Action =
   | { type: 'next'; now: number }
   | { type: 'hint' }
   | { type: 'home' }
-  | { type: 'setLevel'; level: LevelId };
+  | { type: 'setLevel'; level: LevelId }
+  | { type: 'setTrack'; track: Track };
 
 const MAX_DIGITS = 3;
 
 export function reducer(state: SessionState, action: Action): SessionState {
   switch (action.type) {
     case 'start': {
-      const round = generateRound(action.level, action.seed);
+      const round = generateRound(state.track, action.level, action.seed);
       return {
         ...state,
         screen: 'quiz',
@@ -81,6 +85,7 @@ export function reducer(state: SessionState, action: Action): SessionState {
       return {
         ...state,
         screen: 'quiz',
+        track: round.track,
         level: round.level,
         mode: 'practice',
         practiceSkill: action.skill,
@@ -167,6 +172,9 @@ export function reducer(state: SessionState, action: Action): SessionState {
 
     case 'setLevel':
       return { ...state, level: action.level };
+
+    case 'setTrack':
+      return { ...state, track: action.track };
 
     default:
       return state;

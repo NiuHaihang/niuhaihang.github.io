@@ -1,13 +1,16 @@
-import type { LevelId } from '../game/types';
+import type { LevelId, Track } from '../game/types';
 import type { Lang } from '../i18n/strings';
 
 export interface Progress {
   v: 1;
   lang: Lang;
   sound: boolean;
+  /** Which quiz set the child used last. */
+  track: Track;
   level: LevelId;
-  stars: Record<LevelId, number>;
-  best: Record<LevelId, number>;
+  /** Keyed `${track}:${level}`, so each quiz set keeps its own stars. */
+  stars: Record<string, number>;
+  best: Record<string, number>;
   days: string[];
   rounds: number;
   correct: number;
@@ -16,15 +19,31 @@ export interface Progress {
 const KEY = 'bunnymath.v1';
 
 const LEVEL_IDS: LevelId[] = ['sprout', 'blossom', 'sparkle', 'starlight'];
+const TRACK_IDS: Track[] = ['addsub', 'all4'];
+
+function slotKey(track: Track, level: LevelId): string {
+  return `${track}:${level}`;
+}
+
+function emptyScores(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const track of TRACK_IDS) for (const level of LEVEL_IDS) out[slotKey(track, level)] = 0;
+  return out;
+}
+
+function isTrack(value: unknown): value is Track {
+  return value === 'addsub' || value === 'all4';
+}
 
 export function defaultProgress(): Progress {
   return {
     v: 1,
     lang: 'en',
     sound: true,
+    track: 'addsub',
     level: 'blossom',
-    stars: { sprout: 0, blossom: 0, sparkle: 0, starlight: 0 },
-    best: { sprout: 0, blossom: 0, sparkle: 0, starlight: 0 },
+    stars: emptyScores(),
+    best: emptyScores(),
     days: [],
     rounds: 0,
     correct: 0,
@@ -87,17 +106,22 @@ export function normalize(raw: unknown): Progress {
 
   const stars = { ...base.stars };
   const best = { ...base.best };
-  for (const id of LEVEL_IDS) {
-    const s = data.stars?.[id];
-    if (typeof s === 'number') stars[id] = Math.max(0, Math.min(3, Math.round(s)));
-    const b = data.best?.[id];
-    if (typeof b === 'number') best[id] = Math.max(0, Math.min(100, Math.round(b)));
+  for (const track of TRACK_IDS) {
+    for (const id of LEVEL_IDS) {
+      const key = slotKey(track, id);
+      // Older saves (before multiplication) stored bare level keys.
+      const rawStars = data.stars?.[key] ?? (track === 'addsub' ? data.stars?.[id] : undefined);
+      const rawBest = data.best?.[key] ?? (track === 'addsub' ? data.best?.[id] : undefined);
+      if (typeof rawStars === 'number') stars[key] = Math.max(0, Math.min(3, Math.round(rawStars)));
+      if (typeof rawBest === 'number') best[key] = Math.max(0, Math.min(100, Math.round(rawBest)));
+    }
   }
 
   return {
     ...base,
     lang: isLang(data.lang) ? data.lang : base.lang,
     sound: typeof data.sound === 'boolean' ? data.sound : base.sound,
+    track: isTrack(data.track) ? data.track : base.track,
     level: isLevel(data.level) ? data.level : base.level,
     stars,
     best,
@@ -124,6 +148,8 @@ export function saveProgress(progress: Progress): void {
     // Private mode / full storage: the game still works, progress just is not kept.
   }
 }
+
+export { slotKey };
 
 export function clearProgress(): void {
   try {
