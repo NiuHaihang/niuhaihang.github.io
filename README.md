@@ -1,5 +1,7 @@
 # 🐰 Bunny Math
 
+[English](README.md) | [中文](README.zh.md)
+
 A cute little addition & subtraction playground for ~8-year-olds, built as a
 **pure front-end** web app. No accounts, no backend, no data leaves the device.
 
@@ -73,13 +75,15 @@ tests run on the same engine the kid will use.
 ## Deploy to GitHub Pages
 
 1. Push this repo to GitHub (default branch `main`).
-2. **Settings → Pages → Source: GitHub Actions**.
-3. The workflow in `.github/workflows/deploy.yml` builds with
-   `VITE_BASE=/<repo-name>/` on every push, runs the unit tests first, and
-   publishes `dist`.
+2. **Settings → Pages → Source: GitHub Actions**. Do *not* pick
+   "Deploy from a branch": that publishes the raw repository, the browser then
+   tries to execute `src/main.tsx`, and the page stays blank.
+3. The workflow in `.github/workflows/deploy.yml` runs the unit tests, builds
+   with the right base path, and publishes `dist` on every push.
 
-The base path is read from `VITE_BASE`, so the same code works at a project
-sub-path, a custom domain (`VITE_BASE=/`), or locally.
+The base path is read from `VITE_BASE` and the workflow picks it automatically:
+`/` for a user/org site repository (`<name>.github.io`), `/<repo>/` for a normal
+project repository, `/` locally.
 
 ## How the difficulty works
 
