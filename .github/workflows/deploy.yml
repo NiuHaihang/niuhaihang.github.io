@@ -30,16 +30,11 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
         env:
-          # E2E drives the Chrome that ships with GitHub runners; the
-          # Playwright browser bundle is never needed here.
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
       - name: Unit tests
-        run: pnpm test
+        run: pnpm -r --if-present test
 
-      # A user/org site (<name>.github.io) is served from "/", every other
-      # repository from "/<repo>/". Getting this wrong yields a blank page:
-      # the HTML loads, the hashed assets 404.
       - name: Work out the base path
         id: base
         run: |
@@ -49,16 +44,25 @@ jobs:
             echo "value=/${{ github.event.repository.name }}/" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build
-        run: pnpm build
+      - name: Build every app into site/
         env:
-          VITE_BASE: ${{ steps.base.outputs.value }}
+          BASE: ${{ steps.base.outputs.value }}
+        run: |
+          set -euo pipefail
+          rm -rf site && mkdir -p site
+          VITE_BASE="$BASE" pnpm --filter @bunny/math build
+          cp -R apps/math/dist/. site/
+          if [ -d apps/english ]; then
+            VITE_BASE="${BASE}english/" pnpm --filter @bunny/english build
+            mkdir -p site/english
+            cp -R apps/english/dist/. site/english/
+          fi
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
   deploy:
     needs: build

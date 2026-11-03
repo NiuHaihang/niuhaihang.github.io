@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  apps/math:
     dependencies:
       '@fontsource-variable/fredoka':
         specifier: ^5.2.8
