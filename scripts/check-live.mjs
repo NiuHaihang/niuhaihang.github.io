@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ channel: 'chrome' });
+const ctx = await b.newContext({ viewport: { width: 1180, height: 820 }, deviceScaleFactor: 2 });
+const p = await ctx.newPage();
+const errors = [];
+p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+p.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
+await p.goto('https://niuhaihang.github.io/', { waitUntil: 'networkidle' });
+await p.waitForTimeout(800);
+console.log('root children:', await p.evaluate(() => document.querySelector('#root')?.children.length));
+console.log('title:', await p.title());
+console.log('errors:', JSON.stringify(errors.slice(0, 4)));
+await p.screenshot({ path: 'shots/31-live.png' });
+await p.getByRole('button', { name: /Start/ }).click();
+await p.waitForSelector('.equation');
+console.log('quiz:', await p.locator('.equation').getAttribute('aria-label'));
+await b.close();
