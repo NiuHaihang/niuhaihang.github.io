@@ -3,11 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Little learning games for kids: Bunny Math and Bunny English.",
+  "description": "Little learning games for kids: math, English and Chinese literacy.",
   "scripts": {
     "dev": "pnpm --filter @bunny/math dev",
     "dev:math": "pnpm --filter @bunny/math dev",
     "dev:english": "pnpm --filter @bunny/english dev",
+    "dev:chinese": "pnpm --filter @bunny/chinese dev",
     "build": "pnpm -r build",
     "build:site": "node scripts/build-site.mjs",
     "test": "pnpm -r --if-present test",

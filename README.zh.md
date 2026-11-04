@@ -2,22 +2,25 @@
 
 [English](README.md) | **中文**
 
-一个给 8 岁左右小朋友用的**纯前端**学习站点，里面有两个应用，一个仓库、一次部署：
+一个给小学生用的**纯前端**学习站点，里面有三个应用，一个仓库、一次部署：
 
 | 应用 | 地址 | 内容 |
 | --- | --- | --- |
 | 🐰 小兔数学 | `/` | 加减乘除，18 题一局，可打印练习纸 |
 | 🐰 小兔英语 | `/english/` | 人教版 PEP 词汇 / 自然拼读 / 语法，12 题一课 |
+| 🐰 小兔语文 | `/chinese/` | 一到六年级人教版字表，12 册、3,460 个分读音学习项 |
 
 ```bash
 pnpm install
 pnpm dev:math       # 数学 → http://127.0.0.1:5173
 pnpm dev:english    # 英语 → http://127.0.0.1:5174
+pnpm dev:chinese    # 语文 → http://127.0.0.1:5175
 pnpm build:site     # 本地拼出完整站点（= CI 的产物）
 ```
 
 英语应用的细节（内容范围、复习间隔、音频生成）见
 [apps/english/README.md](apps/english/README.md)。下面是小兔数学的说明。
+语文内容范围和设备朗读说明见 [apps/chinese/README.md](apps/chinese/README.md)。
 
 ---
 
@@ -85,7 +88,7 @@ pnpm --filter @bunny/math preview
 ## 测试
 
 ```bash
-pnpm test         # 25 个单元测试：难度模型 + 出题器的各项不变量（两个应用都跑）
+pnpm test         # 三个应用的单元测试
 pnpm e2e          # 4 条 Playwright 流程，直接驱动本机 Chrome
 ```
 
@@ -135,6 +138,7 @@ apps/
     src/styles/     一个手写的、带设计 token 的 CSS 文件
     e2e/            Playwright 流程测试
   english/   英语应用  →  /english/   （见 apps/english/README.md）
+  chinese/   语文应用  →  /chinese/   （见 apps/chinese/README.md）
 scripts/     站点拼装（build-site）、图标、截图
 docs/        README 用到的截图
 ```

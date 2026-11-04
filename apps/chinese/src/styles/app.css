@@ -1,0 +1,101 @@
+/* Keep the shared bunny/card design; use mint to identify the Chinese subject. */
+.app-chinese {
+  --berry: #2b9a80;
+  --berry-deep: #217761;
+  --sky: #d4f5e6;
+  --font-display: 'Nunito Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.app-chinese .grades { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.app-chinese .subjects a[aria-current='page'] { background: #e4f6ed; border-color: var(--berry); color: var(--berry-deep); }
+.app-chinese .grade.is-selected { background: #e4f6ed; border-color: var(--berry); color: var(--berry-deep); }
+.app-chinese .next-lesson { background: linear-gradient(115deg, #e5f7ec, #fff8e7); border-color: #b7e3cc; }
+.app-chinese .bar__fill { background: linear-gradient(90deg, #a9e4b9, var(--berry)); }
+.app-chinese .next-lesson .btn { box-shadow: 0 5px 0 #1c6552; }
+.app-chinese .hero__subtitle { text-wrap: balance; }
+.app-chinese .bar > strong { flex: 1; text-align: center; font-size: 1rem; }
+.character-preview { font-size: 1.1rem; letter-spacing: 0.06em; }
+.content-note { color: var(--ink-soft); font-size: 0.8rem; line-height: 1.6; }
+
+/* A single large character stays central; examples and pinyin support recognition. */
+.character-study {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 20px 0;
+}
+.character-study h1 { font-size: 1.1rem; color: var(--ink-soft); }
+.character-study__pinyin, .quiz-pinyin { font-size: 1.9rem; font-weight: 800; color: var(--berry-deep); margin: 0; }
+.character-grid {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(160px, 28vw, 220px);
+  aspect-ratio: 1;
+  border: 2px solid #b7d9c7;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+.character-grid::before, .character-grid::after { content: ''; position: absolute; }
+.character-grid::before { left: 50%; top: 0; bottom: 0; border-left: 1px dashed #cce3d5; }
+.character-grid::after { top: 50%; left: 0; right: 0; border-top: 1px dashed #cce3d5; }
+.character-grid span { z-index: 1; font: clamp(112px, 20vw, 160px)/1 'Kaiti SC', 'KaiTi', 'STKaiti', serif; color: var(--plum); }
+.character-example { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.character-example h2 { font-size: 1.7rem; }
+.character-example p { margin: 0; line-height: 1.7; }
+.study-actions { display: flex; justify-content: center; gap: 16px; }
+.reading-audio { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.audio-note { max-width: 360px; margin: 0; color: var(--ink-soft); font-size: 0.8rem; line-height: 1.5; }
+.listening-cue { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.word-cue p:last-child { font-size: 2.5rem; letter-spacing: 0.15em; margin: 10px 0 0; }
+.app-chinese .hanzi-option { font: 3.4rem/1.3 'Kaiti SC', 'KaiTi', 'STKaiti', serif; min-height: 98px; border: 2px solid transparent; }
+.hanzi-option.is-correct { background: var(--mint); border-color: var(--teal); }
+.hanzi-option.is-wrong { background: #ffe4ea; border-color: var(--danger); }
+.app-chinese .feedback__msg { flex: 1; min-width: 0; }
+.app-chinese .feedback__msg span { line-height: 1.6; }
+.missed-character { font-size: 1.8rem; }
+.missed-character small { font: 1rem var(--font-body); }
+.app-chinese .missed__row { gap: 12px; }
+.app-chinese .missed__text { line-height: 1.7; }
+
+@media (max-width: 900px) {
+  .app-chinese .learning-plan { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .app-chinese .grades { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .app-chinese .grade { padding-inline: 8px; }
+  .app-chinese .hero__title { font-size: clamp(1.25rem, 5vw, 1.8rem); }
+  .app-chinese .hero__pills { gap: 6px; }
+  .app-chinese .hero__pills .pill { font-size: 0.75rem; padding: 6px 8px; }
+  .app-chinese .feedback { flex-wrap: wrap; padding: 12px; }
+  .app-chinese .feedback .btn { flex-basis: 100%; }
+  .app-chinese .feedback .mascot { width: 44px; height: 44px; }
+  .app-chinese .study-actions { gap: 10px; }
+  .app-chinese .study-actions .btn { padding-inline: 14px; }
+  .app-chinese .result__stats { gap: 8px; }
+  .app-chinese .stat { padding: 14px 8px; }
+  .app-chinese .missed__row { flex-wrap: wrap; }
+}
+
+/* One book at a time, with the same small cards and bounded page length. */
+.book-picker { margin: 12px 0 24px; }
+.terms, .unit-pages { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.terms .pillbtn { min-width: 100px; }
+.terms .is-selected { color: var(--berry-deep); background: #e4f6ed; border-color: var(--berry); }
+.book-picker .content-note { text-align: center; }
+.unit-pages { margin: 24px auto; gap: 12px; font-size: 0.85rem; }
+.unit-pages > span { color: var(--ink-soft); white-space: nowrap; }
+.unit-pages strong { color: var(--berry-deep); }
+/* Pagination labels need wide pills; the shared icon buttons are fixed circles. */
+.unit-pages .pillbtn { border: 1px solid #b7e3cc; background: #e4f6ed; color: var(--berry-deep); white-space: nowrap; transition: background 150ms, transform 150ms; }
+.unit-pages .pillbtn:hover:not(:disabled) { background: #d4efdf; transform: translateY(-2px); }
+.unit-pages .pillbtn:disabled { background: #f5f3f0; border-color: #e8e3df; color: #a49b9c; box-shadow: none; cursor: default; }
+.textbook-source { margin-top: 20px; }
+.textbook-source summary { cursor: pointer; }
+.textbook-source a { color: var(--berry-deep); margin-left: 8px; }

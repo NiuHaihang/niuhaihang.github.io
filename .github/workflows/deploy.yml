@@ -46,17 +46,8 @@ jobs:
 
       - name: Build every app into site/
         env:
-          BASE: ${{ steps.base.outputs.value }}
-        run: |
-          set -euo pipefail
-          rm -rf site && mkdir -p site
-          VITE_BASE="$BASE" pnpm --filter @bunny/math build
-          cp -R apps/math/dist/. site/
-          if [ -d apps/english ]; then
-            VITE_BASE="${BASE}english/" pnpm --filter @bunny/english build
-            mkdir -p site/english
-            cp -R apps/english/dist/. site/english/
-          fi
+          VITE_BASE: ${{ steps.base.outputs.value }}
+        run: pnpm build:site
 
       - uses: actions/configure-pages@v5
 

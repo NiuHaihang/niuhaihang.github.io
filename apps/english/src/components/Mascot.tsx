@@ -2,10 +2,11 @@ interface MascotProps {
   mood?: 'idle' | 'cheer' | 'oops';
   size?: number;
   className?: string;
+  label?: string;
 }
 
 /** Same bunny as Bunny Math, wearing a blue bow for the English app. */
-export function Mascot({ mood = 'idle', size = 120, className = '' }: MascotProps) {
+export function Mascot({ mood = 'idle', size = 120, className = '', label = 'Mochi the bunny' }: MascotProps) {
   const eyeY = mood === 'cheer' ? 42 : 44;
   return (
     <svg
@@ -14,7 +15,7 @@ export function Mascot({ mood = 'idle', size = 120, className = '' }: MascotProp
       height={size}
       className={`mascot ${className}`}
       role="img"
-      aria-label="Mochi the bunny"
+      aria-label={label}
     >
       <defs>
         <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">

@@ -65,6 +65,7 @@ export function Home({
       <nav className="subjects" aria-label={t('subjects')}>
         <a href={`${import.meta.env.BASE_URL}../`}>{t('math')}</a>
         <a href={import.meta.env.BASE_URL} aria-current="page">{t('english')}</a>
+        <a href={`${import.meta.env.BASE_URL}../chinese/`}>{t('chinese')}</a>
       </nav>
 
       <section className="hero">

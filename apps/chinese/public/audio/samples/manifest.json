@@ -1,0 +1,19 @@
+{
+  "generator": "edge-tts 7.3.1",
+  "rate": "-15%",
+  "wordPauseSeconds": 0.65,
+  "examplePauseSeconds": 1.1,
+  "texts": [
+    "天空。",
+    "天空蓝蓝的。",
+    "耳朵。",
+    "兔子的耳朵长长的。",
+    "月亮。",
+    "月亮挂在夜空中。"
+  ],
+  "voices": [
+    "zh-CN-XiaoxiaoNeural",
+    "zh-CN-XiaoyiNeural"
+  ],
+  "trimmedServicePadding": true
+}
