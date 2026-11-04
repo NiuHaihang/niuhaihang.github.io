@@ -6,7 +6,7 @@
   --font-display: 'Nunito Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-.app-chinese .grades { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.app-chinese .grades { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .app-chinese .subjects a[aria-current='page'] { background: #e4f6ed; border-color: var(--berry); color: var(--berry-deep); }
 .app-chinese .grade.is-selected { background: #e4f6ed; border-color: var(--berry); color: var(--berry-deep); }
 .app-chinese .next-lesson { background: linear-gradient(115deg, #e5f7ec, #fff8e7); border-color: #b7e3cc; }
@@ -14,7 +14,7 @@
 .app-chinese .next-lesson .btn { box-shadow: 0 5px 0 #1c6552; }
 .app-chinese .hero__subtitle { text-wrap: balance; }
 .app-chinese .bar > strong { flex: 1; text-align: center; font-size: 1rem; }
-.character-preview { font-size: 1.1rem; letter-spacing: 0.06em; }
+.character-preview { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; gap: 3px; font-size: 1.1rem; line-height: 1.5; }
 .content-note { color: var(--ink-soft); font-size: 0.8rem; line-height: 1.6; }
 
 /* A single large character stays central; examples and pinyin support recognition. */
@@ -64,11 +64,11 @@
 .app-chinese .missed__text { line-height: 1.7; }
 
 @media (max-width: 900px) {
-  .app-chinese .learning-plan { grid-template-columns: 1fr; }
+  .app-chinese .study-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .app-chinese .grades { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
-  .app-chinese .grades { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .app-chinese .grade { padding-inline: 8px; }
   .app-chinese .hero__title { font-size: clamp(1.25rem, 5vw, 1.8rem); }
   .app-chinese .hero__pills { gap: 6px; }
@@ -83,13 +83,19 @@
   .app-chinese .missed__row { flex-wrap: wrap; }
 }
 
+@media (max-width: 540px) {
+  .app-chinese .grades { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .character-preview { gap: 1px; font-size: 1rem; }
+}
+
 /* One book at a time, with the same small cards and bounded page length. */
-.book-picker { margin: 12px 0 24px; }
-.terms, .unit-pages { display: flex; align-items: center; justify-content: center; gap: 14px; }
-.terms .pillbtn { min-width: 100px; }
+.book-picker .section-title { margin: 0 0 12px; }
+.terms { display: flex; align-items: center; gap: 6px; width: min(100%, 300px); }
+.terms .pillbtn { flex: 1; }
 .terms .is-selected { color: var(--berry-deep); background: #e4f6ed; border-color: var(--berry); }
-.book-picker .content-note { text-align: center; }
-.unit-pages { margin: 24px auto; gap: 12px; font-size: 0.85rem; }
+.book-picker__info { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #e1eee6; }
+.book-picker__info strong { color: var(--berry-deep); }
+.unit-pages { display: flex; align-items: center; justify-content: center; margin: 24px auto; gap: 12px; font-size: 0.85rem; }
 .unit-pages > span { color: var(--ink-soft); white-space: nowrap; }
 .unit-pages strong { color: var(--berry-deep); }
 /* Pagination labels need wide pills; the shared icon buttons are fixed circles. */
