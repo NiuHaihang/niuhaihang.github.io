@@ -5,6 +5,11 @@ import { Mascot } from './Mascot';
 
 const GRADES: Grade[] = [3, 4, 5, 6];
 const TOPICS: Topic[] = ['words', 'phonics', 'grammar'];
+const TOPIC_DETAILS = {
+  words: { icon: '🔤', label: 'topicWords', hint: 'wordsHint' },
+  phonics: { icon: '🎵', label: 'topicPhonics', hint: 'phonicsHint' },
+  grammar: { icon: '💬', label: 'topicGrammar', hint: 'grammarHint' },
+} as const;
 
 interface Props {
   grade: Grade;
@@ -18,10 +23,6 @@ interface Props {
   reviewCount: number;
   onReview: () => void;
   onToggleSound: () => void;
-}
-
-function topicKey(topic: Topic) {
-  return topic === 'words' ? 'topicWords' : topic === 'phonics' ? 'topicPhonics' : 'topicGrammar';
 }
 
 export function Home({
@@ -40,6 +41,9 @@ export function Home({
   const { lang, setLang, t } = useI18n();
   const lessons = lessonsFor(grade, topic);
   const totalStars = Object.values(stars).reduce((sum, n) => sum + n, 0);
+  // Recommend the first lesson without a star; practise from the start once all have stars.
+  const nextLesson = lessons.find((lesson) => lesson.ready && !stars[lesson.id])
+    ?? lessons.find((lesson) => lesson.ready);
 
   return (
     <div className="home">
@@ -55,8 +59,6 @@ export function Home({
           <button type="button" className="pillbtn" onClick={onToggleSound} aria-label={sound ? t('soundOn') : t('soundOff')}>
             {sound ? '🔔' : '🔕'}
           </button>
-          <span className="pill">{t('progressStars', { n: totalStars })}</span>
-          {streak > 0 ? <span className="pill pill--warm">🔥 {t('streak', { n: streak })}</span> : null}
         </div>
       </header>
 
@@ -66,28 +68,17 @@ export function Home({
       </nav>
 
       <section className="hero">
+        <Mascot size={168} className="hero__mascot" />
         <div className="hero__text">
-          <p className="hero__hi">{t('tagline')}</p>
-          <h1 className="hero__title">{t('appName')}</h1>
+          <p className="hero__hi">{t('hello')}</p>
+          <h1 className="hero__title">{t('heroTitle')}</h1>
+          <p className="hero__subtitle">{t('heroHint')}</p>
+          <div className="hero__pills">
+            <span className="pill">⭐ {t('progressStars', { n: totalStars })}</span>
+            {streak > 0 ? <span className="pill pill--warm">🔥 {t('streak', { n: streak })}</span> : null}
+          </div>
         </div>
-        <Mascot size={108} className="hero__mascot" />
       </section>
-
-      <button
-        type="button"
-        className={`review-card ${reviewCount > 0 ? 'is-ready' : ''}`}
-        onClick={onReview}
-        disabled={reviewCount === 0}
-      >
-        <span className="review-card__icon" aria-hidden="true">
-          🔁
-        </span>
-        <span className="review-card__text">
-          <strong>{t('review')}</strong>
-          <small>{reviewCount > 0 ? t('reviewHint', { n: reviewCount }) : t('reviewEmpty')}</small>
-        </span>
-        {reviewCount > 0 ? <span className="review-card__count">{reviewCount}</span> : null}
-      </button>
 
       <section className="picker">
         <h2 className="section-title">{t('chooseGrade')}</h2>
@@ -107,51 +98,95 @@ export function Home({
         </div>
       </section>
 
-      <nav className="topics" aria-label={t('topics')}>
-        {TOPICS.map((item) => (
-          <button
-            key={item}
-            type="button"
-            className={`topic ${item === topic ? 'is-selected' : ''}`}
-            aria-current={item === topic}
-            onClick={() => onTopic(item)}
-          >
-            {t(topicKey(item))}
-          </button>
-        ))}
-      </nav>
-
-      <section className="lessons">
-        {lessons.length === 0 ? <p className="empty">{t('emptyGrade')}</p> : null}
-        {lessons.map((lesson) => {
-          const best = stars[lesson.id] ?? 0;
-          return (
+      <section className="topic-picker" aria-labelledby="topics-title">
+        <h2 className="section-title" id="topics-title">{t('explore')}</h2>
+        <nav className="topics" aria-label={t('topics')}>
+          {TOPICS.map((item) => (
             <button
-              key={lesson.id}
+              key={item}
               type="button"
-              className={`lesson ${lesson.ready ? '' : 'lesson--locked'}`}
-              disabled={!lesson.ready}
-              onClick={() => onStart(lesson)}
+              className={`topic topic--${item} ${item === topic ? 'is-selected' : ''}`}
+              aria-current={item === topic}
+              onClick={() => onTopic(item)}
             >
-              {lesson.book ? <span className="lesson__book">{lesson.book[lang]}</span> : null}
-              <span className="lesson__title">{lesson.title}</span>
-              <span className="lesson__zh">{lesson.zh}</span>
-              <span className="lesson__foot">
-                {lesson.ready ? (
-                  <span className="lesson__stars" aria-label={t('stars')}>
-                    {[1, 2, 3].map((i) => (
-                      <span key={i} className={i <= best ? 'star star--on' : 'star'}>
-                        ★
-                      </span>
-                    ))}
-                  </span>
-                ) : (
-                  <span className="lesson__soon">{t('comingSoon')}</span>
-                )}
+              <span className="topic__icon" aria-hidden="true">{TOPIC_DETAILS[item].icon}</span>
+              <span className="topic__text">
+                <strong>{t(TOPIC_DETAILS[item].label)}</strong>
+                <small>{t(TOPIC_DETAILS[item].hint)}</small>
               </span>
+              <span className="topic__check" aria-hidden="true">{item === topic ? '✓' : ''}</span>
             </button>
-          );
-        })}
+          ))}
+        </nav>
+      </section>
+
+      <div className="learning-plan">
+        {nextLesson ? (
+          <section className="next-lesson" aria-labelledby="next-lesson-title">
+            <span className="next-lesson__picture" aria-hidden="true">{nextLesson.words[0]?.emoji ?? TOPIC_DETAILS[topic].icon}</span>
+            <div className="next-lesson__text">
+              <h2 id="next-lesson-title">{t(stars[nextLesson.id] ? 'practiceLesson' : 'nextLesson')}</h2>
+              <h3>{nextLesson.title}</h3>
+              <p>{nextLesson.book ? nextLesson.book[lang] : t(TOPIC_DETAILS[topic].label)} · {nextLesson.zh}</p>
+            </div>
+            <button type="button" className="btn btn--primary" onClick={() => onStart(nextLesson)}>
+              {t('startLesson')} <span aria-hidden="true">→</span>
+            </button>
+          </section>
+        ) : null}
+        <button
+          type="button"
+          className={`review-card ${reviewCount > 0 ? 'is-ready' : ''}`}
+          onClick={onReview}
+          disabled={reviewCount === 0}
+        >
+          <span className="review-card__icon" aria-hidden="true">🔁</span>
+          <span className="review-card__text">
+            <strong>{t('review')}</strong>
+            <small>{reviewCount > 0 ? t('reviewHint', { n: reviewCount }) : t('reviewEmpty')}</small>
+          </span>
+          {reviewCount > 0 ? <span className="review-card__count">{reviewCount}</span> : null}
+        </button>
+      </div>
+
+      <section className="course-list" aria-labelledby="all-lessons-title">
+        <div className="course-list__heading">
+          <h2 className="section-title" id="all-lessons-title">{t('allLessons')}</h2>
+          <span>{t('lessonCount', { n: lessons.length })}</span>
+        </div>
+        <div className="lessons">
+          {lessons.length === 0 ? <p className="empty">{t('emptyGrade')}</p> : null}
+          {lessons.map((lesson) => {
+            const best = stars[lesson.id] ?? 0;
+            return (
+              <button
+                key={lesson.id}
+                type="button"
+                className={`lesson ${lesson.ready ? '' : 'lesson--locked'}`}
+                disabled={!lesson.ready}
+                onClick={() => onStart(lesson)}
+              >
+                <span className="lesson__icon" aria-hidden="true">{lesson.words[0]?.emoji ?? TOPIC_DETAILS[lesson.topic].icon}</span>
+                {lesson.book ? <span className="lesson__book">{lesson.book[lang]}</span> : null}
+                <span className="lesson__title">{lesson.title}</span>
+                <span className="lesson__zh">{lesson.zh}</span>
+                <span className="lesson__foot">
+                  {lesson.ready ? (
+                    <span className="lesson__stars" aria-label={t('stars')}>
+                      {[1, 2, 3].map((i) => (
+                        <span key={i} className={i <= best ? 'star star--on' : 'star'}>
+                          ★
+                        </span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span className="lesson__soon">{t('comingSoon')}</span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
