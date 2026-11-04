@@ -1,5 +1,10 @@
 const zh = {
   appName: '小兔英语',
+  subjects: '学习科目',
+  math: '学数学',
+  english: '学英语',
+  language: 'English',
+  topics: '学习内容',
   tagline: '跟着教材，一课一课来',
   chooseGrade: '选年级',
   gradeLabel: '{n} 年级',
@@ -58,6 +63,11 @@ export type StringKey = keyof typeof zh;
 
 const en: Record<StringKey, string> = {
   appName: 'Bunny English',
+  subjects: 'Subjects',
+  math: 'Math',
+  english: 'English',
+  language: '中文',
+  topics: 'Topics',
   tagline: 'One lesson at a time',
   chooseGrade: 'Grade',
   gradeLabel: 'Grade {n}',

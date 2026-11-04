@@ -89,6 +89,11 @@ export function Home({
         </div>
       </header>
 
+      <nav className="subjects" aria-label={t('home.subjects')}>
+        <a href={import.meta.env.BASE_URL} aria-current="page">{t('home.math')}</a>
+        <a href={`${import.meta.env.BASE_URL}english/`}>{t('home.english')}</a>
+      </nav>
+
       <section className="home__hero">
         <div className="home__mochi">
           <Mascot mood="idle" size={168} />

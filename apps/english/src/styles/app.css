@@ -97,6 +97,7 @@ h3 {
 
 .home__top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -120,6 +121,7 @@ h3 {
 
 .home__tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -132,6 +134,40 @@ h3 {
   background: var(--white);
   box-shadow: var(--shadow-soft);
   font-size: 1.1rem;
+}
+
+.pillbtn--text {
+  width: auto;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.subjects {
+  display: flex;
+  gap: 8px;
+}
+
+.subjects a {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--plum);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.subjects a[aria-current='page'] {
+  background: var(--berry-deep);
+  color: var(--white);
+}
+
+.subjects a:focus-visible {
+  outline: 3px solid var(--plum);
+  outline-offset: 3px;
 }
 
 .pill {
@@ -218,7 +254,7 @@ h3 {
   border: none;
   background: transparent;
   border-radius: 999px;
-  padding: 9px 18px;
+  padding: 9px clamp(10px, 2.5vw, 18px);
   font-weight: 800;
   color: var(--ink-soft);
 }

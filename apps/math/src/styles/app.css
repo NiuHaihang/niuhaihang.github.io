@@ -336,6 +336,32 @@ h3 {
   gap: 8px;
 }
 
+.subjects {
+  display: flex;
+  gap: 8px;
+}
+
+.subjects a {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--plum);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.subjects a[aria-current='page'] {
+  background: var(--berry-deep);
+  color: var(--white);
+}
+
+.subjects a:focus-visible {
+  outline: 3px solid var(--plum);
+  outline-offset: 3px;
+}
+
 .home__hero {
   display: flex;
   align-items: center;

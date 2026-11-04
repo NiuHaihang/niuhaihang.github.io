@@ -1,5 +1,8 @@
 export const en = {
   'app.name': 'Bunny Math',
+  'home.subjects': 'Subjects',
+  'home.math': 'Math',
+  'home.english': 'English',
 
   'home.hello': "Hi, I'm Mochi!",
   'home.title': 'Ready to count?',
@@ -137,6 +140,9 @@ export type StringKey = keyof typeof en;
 
 export const zh: Record<StringKey, string> = {
   'app.name': '小兔数学',
+  'home.subjects': '学习科目',
+  'home.math': '学数学',
+  'home.english': '学英语',
 
   'home.hello': '你好，我是麻薯！',
   'home.title': '来数一数吧？',

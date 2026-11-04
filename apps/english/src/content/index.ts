@@ -4,8 +4,8 @@ import { SOUND_SETS } from './phonics';
 import type { Grade, GrammarPoint, SoundSet, Topic, Unit, Word } from './types';
 
 export interface Lesson {
-  /** 三上 / 四下 … for textbook units; empty for phonics and grammar. */
-  book?: string;
+  /** Localized textbook label; empty for phonics and grammar. */
+  book?: { zh: string; en: string };
   id: string;
   grade: Grade;
   topic: Topic;
@@ -23,7 +23,10 @@ const CN_GRADE: Record<number, string> = { 3: '三', 4: '四', 5: '五', 6: '六
 const wordUnits: Lesson[] = PEP_WORDS.map((u: Unit) => ({
   id: u.id,
   grade: u.grade,
-  book: `${CN_GRADE[u.grade] ?? u.grade}${u.term}`,
+  book: {
+    zh: `${CN_GRADE[u.grade] ?? u.grade}${u.term}`,
+    en: `Grade ${u.grade} · Book ${u.term === '上' ? 1 : 2}`,
+  },
   topic: 'words',
   title: `U${u.n} ${u.title}`,
   zh: u.zh,

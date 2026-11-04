@@ -37,7 +37,7 @@ export function Home({
   onReview,
   onToggleSound,
 }: Props) {
-  const { t } = useI18n();
+  const { lang, setLang, t } = useI18n();
   const lessons = lessonsFor(grade, topic);
   const totalStars = Object.values(stars).reduce((sum, n) => sum + n, 0);
 
@@ -49,6 +49,9 @@ export function Home({
           <span className="brand__name">{t('appName')}</span>
         </div>
         <div className="home__tools">
+          <button type="button" className="pillbtn pillbtn--text" onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
+            {t('language')}
+          </button>
           <button type="button" className="pillbtn" onClick={onToggleSound} aria-label={sound ? t('soundOn') : t('soundOff')}>
             {sound ? '🔔' : '🔕'}
           </button>
@@ -56,6 +59,11 @@ export function Home({
           {streak > 0 ? <span className="pill pill--warm">🔥 {t('streak', { n: streak })}</span> : null}
         </div>
       </header>
+
+      <nav className="subjects" aria-label={t('subjects')}>
+        <a href={`${import.meta.env.BASE_URL}../`}>{t('math')}</a>
+        <a href={import.meta.env.BASE_URL} aria-current="page">{t('english')}</a>
+      </nav>
 
       <section className="hero">
         <div className="hero__text">
@@ -99,7 +107,7 @@ export function Home({
         </div>
       </section>
 
-      <nav className="topics" aria-label="topics">
+      <nav className="topics" aria-label={t('topics')}>
         {TOPICS.map((item) => (
           <button
             key={item}
@@ -125,7 +133,7 @@ export function Home({
               disabled={!lesson.ready}
               onClick={() => onStart(lesson)}
             >
-              {lesson.book ? <span className="lesson__book">{lesson.book}</span> : null}
+              {lesson.book ? <span className="lesson__book">{lesson.book[lang]}</span> : null}
               <span className="lesson__title">{lesson.title}</span>
               <span className="lesson__zh">{lesson.zh}</span>
               <span className="lesson__foot">
