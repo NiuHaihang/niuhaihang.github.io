@@ -89,21 +89,24 @@ function run(args) {
   });
 }
 
+const WORKERS = Number(process.env.WORKERS ?? 4);
 let made = 0;
 let skipped = 0;
-for (const job of jobs) {
+let done = 0;
+
+async function handle(job) {
   const dir = join(root, job.dir);
   await mkdir(dir, { recursive: true });
   const out = join(dir, job.file);
   if (await exists(out)) {
     skipped += 1;
-    continue;
+    done += 1;
+    return;
   }
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       await run(['--voice', VOICE, `--rate=${RATE}`, '--text', job.text, '--write-media', out]);
       made += 1;
-      process.stdout.write(`\r  ${made + skipped}/${jobs.length}  ${job.file}            `);
       break;
     } catch (error) {
       if (attempt === 3) {
@@ -113,7 +116,22 @@ for (const job of jobs) {
       await new Promise((r) => setTimeout(r, 800 * attempt));
     }
   }
+  done += 1;
+  if (done % 10 === 0) process.stdout.write(`\r  ${done}/${jobs.length}  ${job.file}            `);
 }
+
+// A small pool: edge-tts is a network round trip, so a few at a time is much
+// faster than one by one and still gentle on the endpoint.
+const queue = [...jobs];
+await Promise.all(
+  Array.from({ length: Math.min(WORKERS, queue.length) }, async () => {
+    for (;;) {
+      const job = queue.shift();
+      if (!job) return;
+      await handle(job);
+    }
+  }),
+);
 
 await writeFile(
   join(root, 'public/audio/manifest.json'),

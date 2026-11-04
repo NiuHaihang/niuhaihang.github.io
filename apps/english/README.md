@@ -48,21 +48,24 @@
 
 ## 内容范围
 
-单元表覆盖 PEP 三上到六下共 **46 个单元**（六下只有 4 个单元，其余七册各 6 个）。
-目前已经填好 **12 个单元、133 个词**（每个词都有 emoji 和例句）：
+单元表覆盖 PEP 三上到六下共 **46 个单元**（六下只有 4 个单元，其余七册各 6 个），
+**全部填好**：473 条词条、497 个不同拼写，每个词都有 emoji 和一句例句。
 
-| 册 | 单元 |
-| --- | --- |
-| 三上 | U1 Hello! · U2 Colours · U3 Look at me! · U4 We love animals · U5 Let's eat! · U6 Happy birthday! |
-| 四上 | U1 My classroom · U2 My schoolbag · U3 My friends · U4 My home · U5 Dinner's ready · U6 Meet my family! |
+| 册 | 单元 | 词 |
+| --- | --- | --- |
+| 三上 / 三下 | 12 个单元：问候、颜色、身体、动物、食物、数字… | 133 |
+| 四上 / 四下 | 12 个单元：教室、书包、朋友、家、学校、时间、天气、农场、衣服、购物… | 120 |
+| 五上 / 五下 | 12 个单元：性格、一周、食物、能力、房间、自然公园、作息、季节、月份、物主代词… | 120 |
+| 六上 / 六下 | 10 个单元：问路、交通、计划、爱好、职业、情绪、比较级、过去时… | 100 |
 
-其余单元在单元表里已有标题和中文，卡片上标「马上就来」。加内容只需要往
-`src/content/pep.ts` 的 `WORD_BANK` 里补 `w(id, en, zh, emoji, sentence)`，界面会自动出现。
+想加或改内容，只需要往 `src/content/pep.ts` 的 `WORD_BANK` 里补
+`w(id, en, zh, emoji, sentence)`，再跑一次 `node scripts/gen-audio.mjs` 补音频，界面会自动出现。
 
 ## 听力和发音
 
 `public/audio/words/<slug>.mp3` 和 `public/audio/sentences/<slug>.mp3` 是**预生成**的音频，
-用 `edge-tts` 的 `en-US-AnaNeural`（童声）生成，语速 `-10%`，每个词约 11 KB。
+用 `edge-tts` 的 `en-US-AnaNeural`（童声）生成，语速 `-10%`。
+目前一共 **999 个文件**（497 个单词 + 502 个句子），约 15 MB，每个文件约 11 KB / 2 秒。
 
 ```bash
 cd apps/english
