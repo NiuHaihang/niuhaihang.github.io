@@ -45,6 +45,7 @@ body {
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -291,7 +292,7 @@ h3 {
   font-weight: 600;
 }
 
-.iconbtn.is-danger {
+.home__tools .iconbtn.is-danger {
   background: var(--berry-deep);
   color: var(--white);
   border-color: var(--berry-deep);
@@ -301,13 +302,16 @@ h3 {
 
 .home {
   gap: clamp(14px, 2.4vw, 26px);
+  padding: max(12px, env(safe-area-inset-top)) clamp(14px, 3vw, 28px) max(16px, env(safe-area-inset-bottom));
 }
 
 .home__top {
-  display: flex;
+  display: grid;
+  /* Equal side columns keep navigation centred regardless of title or tools. */
+  grid-template-columns: minmax(0, 1fr) 340px minmax(0, 1fr);
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 20px;
 }
 
 .brand {
@@ -315,39 +319,59 @@ h3 {
   align-items: center;
   gap: 8px;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(1rem, 2.2vw, 1.18rem);
+  font-size: 1.15rem;
   color: var(--plum);
 }
 
-.brand__ear {
-  width: 11px;
-  height: 19px;
-  display: inline-block;
-  border-radius: 60% 60% 45% 45%;
-  background: linear-gradient(180deg, var(--blush), var(--berry));
-  transform: rotate(-16deg);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6);
+.brand .mascot {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 8px rgba(91, 76, 138, 0.12));
 }
 
 .home__tools {
   display: flex;
+  justify-self: end;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
+.home__tools .iconbtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: var(--white);
+  box-shadow: 0 10px 24px -18px rgba(93, 63, 92, 0.5);
+  font-size: 1.1rem;
+}
+
+.home__tools .iconbtn--text {
+  width: auto;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .subjects {
   display: flex;
-  gap: 8px;
+  justify-self: center;
+  width: min(100%, 340px);
+  height: 50px;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: #f0ebf6;
+  line-height: 20px;
 }
 
 .subjects a {
   flex: 1;
-  padding: 10px 16px;
+  padding: 10px 12px;
   border-radius: 999px;
-  background: var(--white);
+  background: transparent;
   color: var(--plum);
   font-weight: 800;
+  font-size: 0.88rem;
   text-align: center;
   text-decoration: none;
 }
@@ -1701,6 +1725,20 @@ h3 {
 
 /* ------------------------------------------------------------- responsive */
 
+/* Match the language subjects: the navigation gets its own row on phones. */
+@media (max-width: 900px) {
+  .home__top { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 50px 50px; gap: 14px; }
+  .subjects { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+}
+
+@media (max-width: 640px) {
+  .home { padding-left: 12px; padding-right: 12px; }
+}
+
+@media (max-width: 380px) {
+  .brand { gap: 6px; font-size: 1rem; }
+}
+
 @media (max-width: 560px) {
   .track {
     flex-direction: column;
@@ -1812,8 +1850,7 @@ h3 {
   /* ...and keep the whole start screen above the fold. */
   .home {
     gap: 6px;
-    padding: 8px clamp(12px, 2vw, 20px);
-    max-width: none;
+    padding-top: 8px;
     height: 100dvh;
   }
 

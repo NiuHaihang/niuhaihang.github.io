@@ -54,11 +54,20 @@ export function Home({
     <div className="screen home">
       <header className="home__top">
         <span className="brand">
-          <span className="brand__ear" aria-hidden="true" />
+          <Mascot size={44} decorative />
           {t('app.name')}
         </span>
 
+        <nav className="subjects" aria-label={t('home.subjects')}>
+          <a href={import.meta.env.BASE_URL} aria-current="page">{t('home.math')}</a>
+          <a href={`${import.meta.env.BASE_URL}english/`}>{t('home.english')}</a>
+          <a href={`${import.meta.env.BASE_URL}chinese/`}>{t('home.chinese')}</a>
+        </nav>
+
         <div className="home__tools">
+          <button type="button" className="iconbtn iconbtn--soft iconbtn--text" onClick={onToggleLang}>
+            {t('home.lang')}
+          </button>
           <button
             type="button"
             className="iconbtn iconbtn--soft"
@@ -67,9 +76,6 @@ export function Home({
             title={progress.sound ? t('home.soundOn') : t('home.soundOff')}
           >
             <span aria-hidden="true">{progress.sound ? '🔔' : '🔕'}</span>
-          </button>
-          <button type="button" className="iconbtn iconbtn--soft iconbtn--text" onClick={onToggleLang}>
-            {t('home.lang')}
           </button>
           <button
             type="button"
@@ -88,12 +94,6 @@ export function Home({
           </button>
         </div>
       </header>
-
-      <nav className="subjects" aria-label={t('home.subjects')}>
-        <a href={import.meta.env.BASE_URL} aria-current="page">{t('home.math')}</a>
-        <a href={`${import.meta.env.BASE_URL}english/`}>{t('home.english')}</a>
-        <a href={`${import.meta.env.BASE_URL}chinese/`}>{t('home.chinese')}</a>
-      </nav>
 
       <section className="home__hero">
         <div className="home__mochi">

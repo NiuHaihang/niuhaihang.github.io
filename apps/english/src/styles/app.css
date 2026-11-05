@@ -39,6 +39,10 @@ body {
   min-height: 100%;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: var(--font-body);
   color: var(--ink);
@@ -100,7 +104,8 @@ h3 {
 
 .home__top {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  /* Equal side columns keep navigation centred regardless of title or tools. */
+  grid-template-columns: minmax(0, 1fr) 340px minmax(0, 1fr);
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -124,6 +129,7 @@ h3 {
 
 .home__tools {
   display: flex;
+  justify-self: end;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
@@ -156,10 +162,12 @@ h3 {
   display: flex;
   justify-self: center;
   width: min(100%, 340px);
+  height: 50px;
   gap: 4px;
   padding: 5px;
   border-radius: 999px;
   background: #f0ebf6;
+  line-height: 20px;
 }
 
 .subjects a {
@@ -1147,8 +1155,8 @@ h3 {
   .topics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-@media (max-width: 760px) {
-  .home__top { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
+@media (max-width: 900px) {
+  .home__top { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 50px 50px; gap: 14px; }
   .subjects { grid-column: 1 / -1; grid-row: 2; width: 100%; }
 }
 

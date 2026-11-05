@@ -33,9 +33,11 @@ export function Home({ progress, onGrade, onTerm, onStart, onReview, onToggleSou
         <a href={`${import.meta.env.BASE_URL}../english/`}>学英语</a>
         <a href={import.meta.env.BASE_URL} aria-current="page">学语文</a>
       </nav>
-      <button type="button" className="pillbtn" onClick={onToggleSound} aria-label={progress.sound ? '关闭朗读' : '开启朗读'}>
-        {progress.sound ? '🔔' : '🔕'}
-      </button>
+      <div className="home__tools">
+        <button type="button" className="pillbtn" onClick={onToggleSound} aria-label={progress.sound ? '关闭朗读' : '开启朗读'}>
+          {progress.sound ? '🔔' : '🔕'}
+        </button>
+      </div>
     </header>
     <section className="hero">
       <Mascot size={168} className="hero__mascot" label="麻薯小兔" />
