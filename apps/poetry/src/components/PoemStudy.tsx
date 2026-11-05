@@ -2,9 +2,9 @@ import { useState } from 'react';
 import type { Poem } from '../content';
 import { PoemAudio } from './PoemAudio';
 
-interface Props { poem: Poem; sound: boolean; onHome: () => void; onQuiz: () => void }
+interface Props { poem: Poem; sound: boolean; onHome: () => void; onQuiz: () => void; onComplete: () => void }
 
-export function PoemStudy({ poem, sound, onHome, onQuiz }: Props) {
+export function PoemStudy({ poem, sound, onHome, onQuiz, onComplete }: Props) {
   const [pinyin, setPinyin] = useState(false);
   const [recite, setRecite] = useState(false);
   const [revealed, setRevealed] = useState<number[]>([]);
@@ -38,6 +38,8 @@ export function PoemStudy({ poem, sound, onHome, onQuiz }: Props) {
     </article>
     {sound ? <PoemAudio poemId={poem.id} line={line} /> : <p className="poem-instruction">朗读已关闭，可回首页开启。</p>}
     {!recite ? <section className="poem-meaning" aria-labelledby="meaning-title"><h2 id="meaning-title">诗里说了什么？</h2><p>{poem.meaning}</p></section> : null}
-    <div className="poem-bottom"><p>不用着急，读熟了再试一试。</p><button type="button" className="btn btn--primary" onClick={onQuiz}>读好了，去闯关 →</button></div>
+    <div className="poem-bottom"><p>听读、理解、背诵，按自己的节奏来。</p><div className="poem-audio__buttons">
+      <button type="button" className="btn btn--primary" onClick={onComplete}>读完这首，回首页</button>
+      <button type="button" className="pillbtn pillbtn--text" onClick={onQuiz}>诗词小闯关</button></div></div>
   </div>;
 }

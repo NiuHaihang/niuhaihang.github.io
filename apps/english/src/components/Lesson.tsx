@@ -2,6 +2,7 @@ import type { Exercise } from '../game/exercise';
 import type { SessionState } from '../game/session';
 import { useI18n } from '../i18n/I18nProvider';
 import { ExerciseView } from './Exercise';
+import { ChallengeTrail } from './StarCollection';
 
 interface Props {
   state: SessionState;
@@ -29,7 +30,7 @@ function answerText(exercise: Exercise): string {
 }
 
 export function Lesson({ state, onAnswer, onNext, onExit }: Props) {
-  const { t } = useI18n();
+  const { lang, t } = useI18n();
   const exercise = state.exercises[state.index];
   if (!exercise) return null;
   const total = state.exercises.length;
@@ -41,11 +42,11 @@ export function Lesson({ state, onAnswer, onNext, onExit }: Props) {
         <button type="button" className="iconbtn" onClick={onExit} aria-label={t('home')}>
           ←
         </button>
-        <div className="bar__progress">
-          <div className="bar__fill" style={{ width: `${((state.index + 1) / total) * 100}%` }} />
-        </div>
-        <span className="bar__count">{t('questionOf', { i: state.index + 1, n: total })}</span>
+        <strong className="adventure-title">{state.lessonTitle}</strong>
       </header>
+      {state.mode === 'challenge' ? <ChallengeTrail step={state.index} count={total} stars={state.answers.filter((answer) => answer.correct).length} lang={lang} /> :
+        <div className="learning-progress"><span>{t('questionOf', { i: state.index + 1, n: total })}</span>
+          <progress value={state.index} max={total} aria-label={t('lessonProgress')} /></div>}
 
       <main className="stage">
         <ExerciseView exercise={exercise} phase={state.phase} submitted={state.submitted} onAnswer={onAnswer} />

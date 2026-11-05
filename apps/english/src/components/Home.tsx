@@ -2,6 +2,7 @@ import { lessonsFor, type Lesson } from '../content';
 import type { Grade, Topic } from '../content/types';
 import { useI18n } from '../i18n/I18nProvider';
 import { Mascot } from './Mascot';
+import { StarCollection } from './StarCollection';
 
 const GRADES: Grade[] = [3, 4, 5, 6];
 const TOPICS: Topic[] = ['words', 'phonics', 'grammar'];
@@ -15,11 +16,13 @@ interface Props {
   grade: Grade;
   topic: Topic;
   stars: Record<string, number>;
+  totalStars: number;
   streak: number;
   sound: boolean;
   onGrade: (grade: Grade) => void;
   onTopic: (topic: Topic) => void;
   onStart: (lesson: Lesson) => void;
+  onChallenge: (lesson: Lesson) => void;
   reviewCount: number;
   onReview: () => void;
   onToggleSound: () => void;
@@ -29,18 +32,19 @@ export function Home({
   grade,
   topic,
   stars,
+  totalStars,
   streak,
   sound,
   onGrade,
   onTopic,
   onStart,
+  onChallenge,
   reviewCount,
   onReview,
   onToggleSound,
 }: Props) {
   const { lang, setLang, t } = useI18n();
   const lessons = lessonsFor(grade, topic);
-  const totalStars = Object.values(stars).reduce((sum, n) => sum + n, 0);
   // Recommend the first lesson without a star; practise from the start once all have stars.
   const nextLesson = lessons.find((lesson) => lesson.ready && !stars[lesson.id])
     ?? lessons.find((lesson) => lesson.ready);
@@ -76,7 +80,6 @@ export function Home({
           <h1 className="hero__title">{t('heroTitle')}</h1>
           <p className="hero__subtitle">{t('heroHint')}</p>
           <div className="hero__pills">
-            <span className="pill">⭐ {t('progressStars', { n: totalStars })}</span>
             {streak > 0 ? <span className="pill pill--warm">🔥 {t('streak', { n: streak })}</span> : null}
           </div>
         </div>
@@ -123,6 +126,7 @@ export function Home({
               ))}
             </nav>
           </section>
+          <StarCollection total={totalStars} lang={lang} compact />
         </aside>
         <div className="study-content">
           <div className="learning-plan">
@@ -134,9 +138,9 @@ export function Home({
                   <h3>{nextLesson.title}</h3>
                   <p>{nextLesson.book ? nextLesson.book[lang] : t(TOPIC_DETAILS[topic].label)} · {nextLesson.zh}</p>
                 </div>
-                <button type="button" className="btn btn--primary" onClick={() => onStart(nextLesson)}>
-                  {t('startLesson')} <span aria-hidden="true">→</span>
-                </button>
+                <div className="lesson-actions"><button type="button" className="btn btn--primary" onClick={() => onStart(nextLesson)}>
+                  {t('startLesson')}
+                </button><button type="button" className="pillbtn pillbtn--text" onClick={() => onChallenge(nextLesson)}>{t('extraChallenge')}</button></div>
               </section>
             ) : null}
             <button
@@ -167,10 +171,11 @@ export function Home({
                   {lessons.filter((lesson) => (lesson.book?.[lang] ?? '') === book).map((lesson) => {
                     const best = stars[lesson.id] ?? 0;
                     return (
-                      <button
+                      <article
                         key={lesson.id}
-                        type="button"
                         className={`lesson ${lesson.ready ? '' : 'lesson--locked'}`}
+                      >
+                        <button type="button" className="lesson__start"
                         disabled={!lesson.ready}
                         onClick={() => onStart(lesson)}
                       >
@@ -179,18 +184,15 @@ export function Home({
                         <span className="lesson__zh">{lesson.zh}</span>
                         <span className="lesson__foot">
                           {lesson.ready ? (
-                            <span className="lesson__stars" aria-label={t('stars')}>
-                              {[1, 2, 3].map((i) => (
-                                <span key={i} className={i <= best ? 'star star--on' : 'star'}>
-                                  ★
-                                </span>
-                              ))}
-                            </span>
+                            <span className="adventure-badge">{best ? `🌷 ${t('explored')}` : `📖 ${t('startLesson')}`}</span>
                           ) : (
                             <span className="lesson__soon">{t('comingSoon')}</span>
                           )}
                         </span>
-                      </button>
+                        </button>
+                        <button type="button" className="lesson__extra" disabled={!lesson.ready} onClick={() => onChallenge(lesson)}
+                          aria-label={`${t('extraChallenge')}: ${lesson.title}`}>{t('extraChallenge')}</button>
+                      </article>
                     );
                   })}
                 </div>

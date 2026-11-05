@@ -3,12 +3,16 @@ import type { Summary } from '../game/session';
 import { useI18n } from '../i18n/I18nProvider';
 import { say } from '../lib/audio';
 import { Mascot } from './Mascot';
+import { StarCollection, StarReward } from './StarCollection';
 
 interface Props {
   summary: Summary;
+  totalStars: number;
+  rewardTotal: number;
   exercises: Exercise[];
   lessonTitle: string;
   isReview: boolean;
+  isChallenge: boolean;
   onAgain: () => void;
   onHome: () => void;
 }
@@ -67,45 +71,20 @@ function speakable(exercise: Exercise): string | null {
   }
 }
 
-export function Result({ summary, exercises, lessonTitle, isReview, onAgain, onHome }: Props) {
-  const { t } = useI18n();
-  const pct = Math.round(summary.accuracy * 100);
+export function Result({ summary, totalStars, rewardTotal, exercises, lessonTitle, isReview, isChallenge, onAgain, onHome }: Props) {
+  const { lang, t } = useI18n();
   const missedRows = summary.missed.map((record) => ({
     record,
     exercise: exercises.find((e) => e.id === record.exerciseId),
   }));
-  const seconds = Math.max(1, Math.round(summary.ms / 1000));
 
   return (
-    <div className="result">
-      <Mascot mood={summary.stars === 3 ? 'cheer' : 'idle'} size={130} />
-      <h1 className="result__title">{t('resultTitle')}</h1>
+    <div className={`result ${isChallenge ? '' : 'result--learning'}`}>
+      <Mascot mood="cheer" size={130} />
+      <h1 className="result__title">{t(isChallenge ? 'challengeDone' : 'resultTitle')}</h1>
       <p className="result__lesson">{isReview ? t('reviewDone') : lessonTitle}</p>
 
-      <div className="stars" aria-label={t('stars')}>
-        {[1, 2, 3].map((i) => (
-          <span key={i} className={`star star--big ${i <= summary.stars ? 'star--on' : ''}`}>
-            ★
-          </span>
-        ))}
-      </div>
-
-      <div className="result__stats">
-        <div className="stat">
-          <span className="stat__value">{pct}%</span>
-          <span className="stat__label">{t('accuracy')}</span>
-        </div>
-        <div className="stat">
-          <span className="stat__value">
-            {summary.correct}/{summary.total}
-          </span>
-          <span className="stat__label">{t('lessonDone')}</span>
-        </div>
-        <div className="stat">
-          <span className="stat__value">{seconds}s</span>
-          <span className="stat__label">{t('time')}</span>
-        </div>
-      </div>
+      <StarReward total={rewardTotal} correct={summary.correct} lang={lang} />
 
       {missedRows.length > 0 ? (
         <section className="missed">
@@ -144,6 +123,7 @@ export function Result({ summary, exercises, lessonTitle, isReview, onAgain, onH
           </ul>
         </section>
       ) : null}
+      <StarCollection total={totalStars} lang={lang} compact />
 
       <div className="result__actions">
         <button type="button" className="btn btn--primary" onClick={onAgain}>

@@ -1,19 +1,21 @@
 import { POEMS, GRADES, type Grade, type Poem } from '../content';
 import type { Progress } from '../lib/storage';
 import { Mascot } from '../../../english/src/components/Mascot';
+import { StarCollection } from '../../../english/src/components/StarCollection';
 
 interface Props {
   progress: Progress;
+  totalStars: number;
   onGrade: (grade: Grade) => void;
   onToggleSound: () => void;
-  onStart: (poem: Poem) => void;
+  onStudy: (poem: Poem) => void;
+  onQuiz: (poem: Poem) => void;
 }
 
-export function Home({ progress, onGrade, onToggleSound, onStart }: Props) {
+export function Home({ progress, totalStars, onGrade, onToggleSound, onStudy, onQuiz }: Props) {
   const poems = POEMS.filter((poem) => progress.grade === 0 || poem.grade === progress.grade);
-  const next = poems.find((poem) => !progress.stars[poem.id]) ?? poems[0]!;
-  const learned = Object.keys(progress.stars).length;
-  const stars = Object.values(progress.stars).reduce((sum, value) => sum + value, 0);
+  const next = poems.find((poem) => !progress.studied.includes(poem.id)) ?? poems[0]!;
+  const learned = progress.studied.length;
 
   return <div className="home">
     <header className="home__top">
@@ -32,9 +34,9 @@ export function Home({ progress, onGrade, onToggleSound, onStart }: Props) {
       <Mascot size={168} className="hero__mascot" label="麻薯小兔" />
       <div className="hero__text">
         <p className="hero__hi">你好，小小读诗人！</p>
-        <h1 className="hero__title">和麻薯一起读古诗</h1>
-        <p className="hero__subtitle">听见诗的节奏，想象诗里的世界。</p>
-        <div className="hero__pills"><span className="pill">⭐ {stars} 颗星星</span><span className="pill pill--warm">🌷 已闯关 {learned} / {POEMS.length} 篇</span></div>
+        <h1 className="hero__title">一起读古诗吧</h1>
+        <p className="hero__subtitle">听朗读、读诗句、懂诗意，慢慢学会背诵。</p>
+        <div className="hero__pills"><span className="pill pill--warm">🌷 已学习 {learned} / {POEMS.length} 篇</span></div>
       </div>
     </section>
 
@@ -50,31 +52,33 @@ export function Home({ progress, onGrade, onToggleSound, onStart }: Props) {
         </section>
         <div className="poetry-note">
           <strong>一首一首，慢慢来</strong>
-          <p>先听读，再看诗意，最后试着背一背。</p>
+          <p>先听读，再理解诗意，最后试着背一背。学完也可以用小闯关练一练。</p>
           <p>收录课标推荐 75 篇与 2 篇拓展。按难度建议分级，不代表教材年级、上下册。</p>
         </div>
+        <StarCollection total={totalStars} lang="zh" compact />
       </aside>
       <div className="study-content">
         <section className="next-lesson" aria-labelledby="next-poem-title">
           <span className="next-lesson__picture" aria-hidden="true">📖</span>
           <div className="next-lesson__text">
-            <h2 id="next-poem-title">{progress.stars[next.id] ? '再读一遍，也有新发现' : '今天读这一首'}</h2>
+            <h2 id="next-poem-title">{progress.studied.includes(next.id) ? '再读一遍，也有新发现' : '今天读这一首'}</h2>
             <h3>{next.title}</h3><p>{next.era} · {next.author}</p>
           </div>
-          <button type="button" className="btn btn--primary" onClick={() => onStart(next)}>开始读诗 →</button>
+          <div className="lesson-actions"><button type="button" className="btn btn--primary" onClick={() => onStudy(next)}>开始读诗 →</button>
+            <button type="button" className="pillbtn pillbtn--text" onClick={() => onQuiz(next)}>诗词小闯关</button></div>
         </section>
         <section className="course-list" aria-labelledby="poems-title">
           <div className="course-list__heading"><h2 className="section-title" id="poems-title">读诗小花园</h2><span>{poems.length} 篇诗词</span></div>
           <div className="lessons">
-            {poems.map((poem) => <button type="button" className="lesson poem-card" key={poem.id} onClick={() => onStart(poem)}>
+            {poems.map((poem) => <article className="lesson poem-card" key={poem.id}>
+              <button type="button" className="lesson__start" onClick={() => onStudy(poem)} aria-label={`读诗：${poem.title}`}>
               <span className="poem-card__tag">{poem.theme}{poem.core ? '' : ' · 拓展'}</span>
               <strong className="lesson__title">{poem.title}</strong>
               <span className="lesson__zh">{poem.era} · {poem.author}</span>
               <span className="poem-card__opening">{poem.lines[0]!.text}</span>
-              <span className="lesson__foot"><span className="lesson__stars" aria-label={`已获得 ${progress.stars[poem.id] ?? 0} 颗星，共 3 颗`}>
-                {[1, 2, 3].map((star) => <span key={star} className={`star ${star <= (progress.stars[poem.id] ?? 0) ? 'star--on' : ''}`}>★</span>)}
-              </span><span className="poem-card__length">{poem.lines.length} 句</span></span>
-            </button>)}
+              <span className="lesson__foot"><span className="adventure-badge">{progress.studied.includes(poem.id) ? '🌷 已学习' : '📖 读一读'}</span><span className="poem-card__length">{poem.lines.length} 句</span></span>
+              </button><button type="button" className="lesson__extra" onClick={() => onQuiz(poem)} aria-label={`小闯关：${poem.title}`}>诗词小闯关</button>
+            </article>)}
           </div>
         </section>
         <details className="poetry-source"><summary>篇目与学习说明</summary>

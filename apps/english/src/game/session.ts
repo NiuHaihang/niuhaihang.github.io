@@ -17,8 +17,9 @@ export interface SessionState {
   screen: Screen;
   grade: Grade;
   topic: Topic;
-  /** A normal lesson banks stars; review does not (it is revision). */
-  mode: 'lesson' | 'review';
+  /** Course practice and optional challenges share lesson progress; reviews
+   * update memory only. All three can earn encouragement stars. */
+  mode: 'lesson' | 'review' | 'challenge';
   lessonId: string;
   lessonTitle: string;
   exercises: Exercise[];
@@ -37,7 +38,7 @@ export type Action =
   | { type: 'setTopic'; topic: Topic }
   | {
       type: 'start';
-      mode?: 'lesson' | 'review';
+      mode?: SessionState['mode'];
       lessonId: string;
       lessonTitle: string;
       exercises: Exercise[];

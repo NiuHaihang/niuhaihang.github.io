@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GRADES, POEMS, POEM_BY_ID, verseText } from './content';
 import { buildRound, isCorrect } from './game';
-import { completeRound, normalize } from './lib/storage';
+import { completeRound, completeStudy, normalize } from './lib/storage';
 
 describe('primary poetry bank', () => {
   it('covers all 75 curriculum entries, two extensions, and all six suggested grades', () => {
@@ -52,12 +52,23 @@ describe('poetry rounds and saved progress', () => {
 
   it('restores only valid poem progress and never lowers a previous best', () => {
     const empty = normalize(null);
-    expect(empty).toEqual({ grade: 1, sound: true, stars: {} });
+    expect(empty).toEqual({ grade: 1, sound: true, stars: {}, studied: [] });
     expect(normalize({ grade: 9, stars: { 'poem-04': 3, unknown: 3, 'poem-05': 9 } }).stars).toEqual({ 'poem-04': 3 });
     const completed = completeRound(empty, 'poem-04', 5, 5);
     expect(empty.stars).toEqual({});
     expect(completed.stars['poem-04']).toBe(3);
     expect(completeRound(completed, 'poem-04', 0, 5).stars['poem-04']).toBe(3);
     expect(normalize({ ...completed, grade: 0, sound: false })).toEqual({ ...completed, grade: 0, sound: false });
+  });
+
+  it('records reading independently of optional quizzes and preserves legacy learning', () => {
+    const read = completeStudy(normalize(null), 'poem-04');
+    expect(read.studied).toEqual(['poem-04']);
+    expect(read.stars).toEqual({});
+    expect(completeStudy(read, 'poem-04').studied).toEqual(['poem-04']);
+    expect(normalize(read)).toEqual(read);
+    const legacy = normalize({ stars: { 'poem-04': 3 }, studied: ['poem-05', 'poem-05', 'unknown', 42] });
+    expect(legacy.studied).toEqual(['poem-04', 'poem-05']);
+    expect(completeRound(read, 'poem-05', 3, 5).studied).toEqual(['poem-04', 'poem-05']);
   });
 });

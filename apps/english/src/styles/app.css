@@ -1148,6 +1148,87 @@ h3 {
   justify-content: center;
 }
 
+/* Learning stays primary; challenges and rewards have smaller secondary entries. */
+.lesson__start { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; padding: 0; border: 0; background: transparent; text-align: left; }
+.lesson__extra { width: 100%; min-height: 40px; margin-top: 4px; padding: 8px 0; border: 0; border-top: 1px solid #eee6f6; background: transparent; color: var(--berry-deep); text-align: left; font-size: 0.8rem; }
+.lesson-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.learning-progress { color: var(--ink-soft); font-size: 0.85rem; }
+.learning-progress progress { display: block; width: 100%; height: 8px; margin-top: 8px; accent-color: var(--berry-deep); }
+.learning-rewards { width: 100%; max-width: 620px; color: #7a6d8a; font-size: 0.8rem; text-align: left; }
+.learning-rewards > summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 12px 0; border-top: 1px solid #e7ddf5; cursor: pointer; }
+.learning-rewards > summary::after { content: '⌄'; }
+.learning-rewards[open] > summary::after { content: '⌃'; }
+.learning-rewards__tokens { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.learning-rewards .star-collection { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; }
+.learning-rewards .star-collection__treasures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.learning-rewards .star-collection__next { display: block; }
+.learning-rewards .star-collection__slots { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); font-size: 0.7rem; gap: 1px; }
+.learning-rewards .star-collection__moon { margin-left: 0; font-size: 1.05em; }
+.learning-rewards .star-collection__next p { margin: 8px 0; }
+.learning-rewards .star-collection__intro h2 { font-size: 0.9rem; }
+.learning-rewards .star-collection__intro p { font-size: 0.75rem; }
+.learning-rewards .star-collection__treasure small { overflow-wrap: anywhere; }
+.result--learning .star-reward { padding: 12px 18px; background: #fff9e8; gap: 4px; }
+.result--learning .star-reward__icon { font-size: 1.5rem; animation: none; }
+.result--learning .star-reward strong { font-size: 1.1rem; }
+.star-collection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 24px;
+  width: 100%;
+  padding: 18px 24px;
+  border: 1px solid #e7ddf5;
+  border-radius: 24px;
+  background: #fcfaff;
+  text-align: left;
+}
+.star-collection__intro h2 { font-size: 1.1rem; color: #5b4b8a; }
+.star-collection__intro p { margin: 6px 0 0; color: #7a6d8a; font-size: 0.85rem; }
+.star-collection__treasures { display: grid; grid-template-columns: repeat(5, 54px); gap: 10px; }
+.star-collection__treasure { display: grid; grid-template-columns: auto auto; align-items: center; justify-content: center; gap: 2px 6px; }
+.star-collection__treasure > span { font-size: 1.5rem; }
+.star-collection__treasure strong { font: 600 1.4rem var(--font-display); color: #5b4b8a; }
+.star-collection__treasure small { grid-column: 1 / -1; text-align: center; color: #7a6d8a; font-size: 0.7rem; }
+.star-collection__next { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 24px; grid-column: 1 / -1; padding-top: 12px; border-top: 1px solid #e7ddf5; }
+.star-collection__slots { grid-row: 1 / span 2; display: flex; align-items: center; gap: clamp(3px, 1vw, 8px); color: #e4ddef; font-size: clamp(1.1rem, 3vw, 1.6rem); line-height: 1.2; }
+.star-collection__slots .is-lit { color: #e5a823; }
+.star-collection__moon { margin-left: 4px; font-size: 1.2em; }
+.star-collection__next p { margin: 0; color: #5b4b8a; font-weight: 800; font-size: 0.85rem; }
+.star-collection__next small { grid-column: 2; color: #7a6d8a; font-size: 0.7rem; }
+.star-collection__rules { grid-column: 1 / -1; color: #7a6d8a; font-size: 0.75rem; line-height: 1.7; }
+.star-collection__rules summary { cursor: pointer; width: fit-content; min-height: 32px; display: list-item; align-content: center; }
+.star-collection__rules p { max-width: 70ch; margin: 8px 0 0; }
+.star-reward { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; width: 100%; border-radius: 28px; background: #fff4cc; text-align: center; }
+.star-reward__icon { font-size: 3rem; animation: star-arrival 0.45s ease-out; }
+.star-reward strong { font: 600 clamp(1.5rem, 4vw, 2rem)/1.3 var(--font-display); color: #80582b; }
+.star-reward p { font-size: 0.85rem; color: #80582b; margin: 0; }
+.star-reward b { padding: 6px 14px; border-radius: 20px; background: white; color: #6d4aab; }
+.challenge-trail { width: 100%; padding: 14px 18px; border: 1px solid #e7ddf5; border-radius: 18px; background: #fcfaff; }
+.challenge-trail > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; color: #5b4b8a; font-size: 0.85rem; }
+.challenge-trail strong { color: #80582b; }
+.challenge-trail small { font-weight: 400; color: #7a6d8a; }
+.challenge-trail progress { display: block; width: 100%; height: 10px; margin-top: 12px; accent-color: var(--berry-deep); }
+.adventure-title { flex: 1; min-width: 0; color: var(--plum); font-family: var(--font-display); font-weight: 500; }
+.adventure-badge { color: #627a62; font-size: 0.75rem; line-height: 1.5; }
+.result > .star-collection, .result > .star-reward, .poem-result > .star-collection, .poem-result > .star-reward { max-width: 620px; }
+@keyframes star-arrival { from { transform: scale(0.6) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .star-reward__icon { animation: none; } }
+@media (max-width: 640px) {
+  .lesson-actions { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  .lesson-actions .btn { flex: 1; min-width: 140px; padding-inline: 16px; font-size: 1rem; }
+  .lesson-actions .pillbtn { flex-shrink: 0; margin-inline: auto; }
+  .star-collection { padding: 16px; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .star-collection__treasures { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .star-collection__intro h2 { font-size: 1rem; }
+  .star-collection__intro p { display: none; }
+  .star-collection__next { display: block; padding-top: 10px; }
+  .star-collection__next p { margin: 8px 0 4px; }
+  .star-collection__slots { justify-content: space-between; gap: 2px; }
+  .star-collection__moon { margin-left: 0; }
+  .challenge-trail { padding: 12px; }
+}
+
 /* ----------------------------------------------------------- small screens */
 @media (max-width: 900px) {
   .study-layout { grid-template-columns: 1fr; gap: 20px; }
