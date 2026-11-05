@@ -172,7 +172,8 @@ h3 {
 
 .subjects a {
   flex: 1;
-  padding: 10px 12px;
+  min-width: 0;
+  padding: 10px 6px;
   border-radius: 999px;
   background: transparent;
   color: var(--plum);

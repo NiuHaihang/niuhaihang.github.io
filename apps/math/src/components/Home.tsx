@@ -62,6 +62,7 @@ export function Home({
           <a href={import.meta.env.BASE_URL} aria-current="page">{t('home.math')}</a>
           <a href={`${import.meta.env.BASE_URL}english/`}>{t('home.english')}</a>
           <a href={`${import.meta.env.BASE_URL}chinese/`}>{t('home.chinese')}</a>
+          <a href={`${import.meta.env.BASE_URL}poetry/`}>{t('home.poetry')}</a>
         </nav>
 
         <div className="home__tools">

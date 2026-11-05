@@ -2,26 +2,30 @@
 
 [English](README.md) | [中文](README.zh.md)
 
-A **pure front-end** learning site for primary-school children: three apps, one repo, one deploy.
+A **pure front-end** learning site for primary-school children: four apps, one repo, one deploy.
 
 | App | URL | What |
 | --- | --- | --- |
 | 🐰 Bunny Math | `/` | add, subtract, multiply, divide — 18 questions a round |
 | 🐰 Bunny English | `/english/` | PEP textbook vocabulary, phonics and grammar — 12 questions a lesson |
 | 🐰 Bunny Chinese | `/chinese/` | PEP textbook character banks for grades 1–6 — 12 books, 3,460 reading entries |
+| 🐰 Bunny Poetry | `/poetry/` | 75 curriculum-recommended poems + 2 extensions, recordings, pinyin and recitation practice |
 
 ```bash
 pnpm install
 pnpm dev:math       # math    → http://127.0.0.1:5173
 pnpm dev:english    # english → http://127.0.0.1:5174
 pnpm dev:chinese    # chinese → http://127.0.0.1:5175
-pnpm build:site     # assemble all three apps exactly like CI does
+pnpm dev:poetry     # poetry  → http://127.0.0.1:5176
+pnpm build:site     # assemble all four apps exactly like CI does
 ```
 
 Details for the English app (content coverage, review spacing, audio generation)
 live in [apps/english/README.md](apps/english/README.md). The rest of this file
 is about Bunny Math. Chinese literacy coverage and device speech requirements are in
 [apps/chinese/README.md](apps/chinese/README.md).
+Poetry coverage, suggested grade grouping and audio generation are documented in
+[apps/poetry/README.md](apps/poetry/README.md).
 
 ---
 

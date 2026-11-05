@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build all three subjects: math at /, English at /english/, Chinese at /chinese/.
+ * Build math at / and each language subject in its own directory.
  *
  * Mirrors what .github/workflows/deploy.yml does, so a local `pnpm build:site`
  * is a faithful preview of the deployed thing (service-worker scopes included).
@@ -26,7 +26,7 @@ run('pnpm', ['--filter', '@bunny/math', 'build'], { VITE_BASE: base });
 cpSync(join(root, 'apps/math/dist'), site, { recursive: true });
 console.log(`math   → ${base}`);
 
-for (const subject of ['english', 'chinese']) {
+for (const subject of ['english', 'chinese', 'poetry']) {
   run('pnpm', ['--filter', `@bunny/${subject}`, 'build'], { VITE_BASE: `${base}${subject}/` });
   mkdirSync(join(site, subject), { recursive: true });
   cpSync(join(root, `apps/${subject}/dist`), join(site, subject), { recursive: true });

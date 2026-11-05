@@ -2,25 +2,28 @@
 
 [English](README.md) | **中文**
 
-一个给小学生用的**纯前端**学习站点，里面有三个应用，一个仓库、一次部署：
+一个给小学生用的**纯前端**学习站点，里面有四个应用，一个仓库、一次部署：
 
 | 应用 | 地址 | 内容 |
 | --- | --- | --- |
 | 🐰 小兔数学 | `/` | 加减乘除，18 题一局，可打印练习纸 |
 | 🐰 小兔英语 | `/english/` | 人教版 PEP 词汇 / 自然拼读 / 语法，12 题一课 |
 | 🐰 小兔语文 | `/chinese/` | 一到六年级人教版字表，12 册、3,460 个分读音学习项 |
+| 🐰 小兔古诗词 | `/poetry/` | 课标推荐 75 篇与 2 篇拓展，听读、拼音、诗意与背诵闯关 |
 
 ```bash
 pnpm install
 pnpm dev:math       # 数学 → http://127.0.0.1:5173
 pnpm dev:english    # 英语 → http://127.0.0.1:5174
 pnpm dev:chinese    # 语文 → http://127.0.0.1:5175
+pnpm dev:poetry     # 古诗词 → http://127.0.0.1:5176
 pnpm build:site     # 本地拼出完整站点（= CI 的产物）
 ```
 
 英语应用的细节（内容范围、复习间隔、音频生成）见
 [apps/english/README.md](apps/english/README.md)。下面是小兔数学的说明。
 语文内容范围和设备朗读说明见 [apps/chinese/README.md](apps/chinese/README.md)。
+古诗词内容、建议分级和音频生成说明见 [apps/poetry/README.md](apps/poetry/README.md)。
 
 ---
 

@@ -32,6 +32,7 @@ export function Home({ progress, onGrade, onTerm, onStart, onReview, onToggleSou
         <a href={`${import.meta.env.BASE_URL}../`}>学数学</a>
         <a href={`${import.meta.env.BASE_URL}../english/`}>学英语</a>
         <a href={import.meta.env.BASE_URL} aria-current="page">学语文</a>
+        <a href={`${import.meta.env.BASE_URL}../poetry/`}>古诗词</a>
       </nav>
       <div className="home__tools">
         <button type="button" className="pillbtn" onClick={onToggleSound} aria-label={progress.sound ? '关闭朗读' : '开启朗读'}>

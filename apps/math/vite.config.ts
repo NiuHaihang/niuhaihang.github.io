@@ -34,7 +34,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         navigateFallback: `${base}index.html`,
         // Other subjects own their routes, including under a GitHub project base.
-        navigateFallbackDenylist: [new RegExp(`^${base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:english|chinese)(?:/|$)`)],
+        navigateFallbackDenylist: [new RegExp(`^${base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:english|chinese|poetry)(?:/|$)`)],
       },
       devOptions: { enabled: false },
     }),

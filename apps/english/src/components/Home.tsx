@@ -57,6 +57,7 @@ export function Home({
           <a href={`${import.meta.env.BASE_URL}../`}>{t('math')}</a>
           <a href={import.meta.env.BASE_URL} aria-current="page">{t('english')}</a>
           <a href={`${import.meta.env.BASE_URL}../chinese/`}>{t('chinese')}</a>
+          <a href={`${import.meta.env.BASE_URL}../poetry/`}>{t('poetry')}</a>
         </nav>
         <div className="home__tools">
           <button type="button" className="pillbtn pillbtn--text" onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>

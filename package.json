@@ -9,6 +9,7 @@
     "dev:math": "pnpm --filter @bunny/math dev",
     "dev:english": "pnpm --filter @bunny/english dev",
     "dev:chinese": "pnpm --filter @bunny/chinese dev",
+    "dev:poetry": "pnpm --filter @bunny/poetry dev",
     "build": "pnpm -r build",
     "build:site": "node scripts/build-site.mjs",
     "test": "pnpm -r --if-present test",

@@ -1,0 +1,119 @@
+/* Keep the established bunny garden; lavender distinguishes the poetry shelf. */
+.app-poetry {
+  --berry: #9274c7;
+  --berry-deep: #6d4aab;
+  --plum: #5b4b8a;
+  --ink-soft: #7a6d8a;
+  --font-display: 'Nunito Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+.app-poetry .next-lesson { background: linear-gradient(115deg, #f1eaff, #fff7e7); border-color: #dfd0f4; }
+.app-poetry .next-lesson .btn { box-shadow: 0 5px 0 #57378f; }
+.app-poetry .hero__title { text-wrap: balance; }
+.poetry-grades { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.poetry-grades .grade:first-child { grid-column: 1 / -1; }
+.poetry-note { color: var(--ink-soft); font-size: 0.85rem; line-height: 1.7; border-top: 1px solid #ece4f5; padding-top: 18px; }
+.poetry-note strong { color: var(--plum); }
+.poetry-note p { margin: 8px 0 0; }
+.poem-card { gap: 8px; }
+.poem-card__tag { color: var(--berry-deep); font-size: 0.75rem; font-weight: 800; }
+.poem-card .lesson__title { line-height: 1.4; min-height: 2.8em; }
+.poem-card__opening { color: var(--plum); font-family: 'Kaiti SC', 'KaiTi', 'STKaiti', serif; font-size: 1.05rem; }
+.poem-card .lesson__foot { margin-top: auto; padding-top: 8px; width: 100%; justify-content: space-between; }
+.poem-card__length { color: var(--ink-soft); font-size: 0.75rem; }
+.poetry-source { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.7; }
+.poetry-source a { color: var(--berry-deep); }
+.poetry-source summary { cursor: pointer; }
+
+.app-poetry .lesson-view { gap: 20px; }
+.app-poetry button:focus-visible { outline: 3px solid var(--berry); outline-offset: 3px; }
+.app-poetry .bar { flex-wrap: wrap; }
+.app-poetry .bar > strong { flex: 1; text-align: center; font-size: 1rem; }
+.poem-tools { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.poem-tools [aria-pressed='true'] { background: #eee5fb; color: var(--berry-deep); }
+.poem-paper {
+  width: min(100%, 780px);
+  margin: 0 auto;
+  padding: 24px clamp(12px, 4vw, 40px) 32px;
+  border: 1px solid #e9e0f3;
+  border-radius: 26px;
+  background: #fffefa;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+.poem-paper__flower { display: block; margin-bottom: 8px; font-size: 1.6rem; }
+.poem-paper h1 { font: 600 clamp(1.3rem, 3vw, 1.8rem)/1.6 var(--font-display); text-wrap: balance; }
+.poem-byline { color: var(--ink-soft); font-size: 0.9rem; margin: 6px 0 16px; }
+.poem-instruction { color: var(--ink-soft); font-size: 0.8rem; text-align: center; line-height: 1.6; }
+.poem-verses { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 20px; }
+.poem-verse {
+  display: block;
+  max-width: 100%;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  padding: 6px 12px;
+  color: var(--plum);
+  font: clamp(1.25rem, 3vw, 1.7rem)/1.6 'Kaiti SC', 'KaiTi', 'STKaiti', serif;
+}
+.poem-verse.is-current { background: #f1eafa; border-color: #e4d6f5; }
+.poem-verse ruby { ruby-align: center; ruby-overhang: none; }
+.poem-verse rt { font: 0.48em/1.8 var(--font-body); color: var(--ink-soft); padding-inline: 3px; }
+.has-pinyin .poem-verse { padding-top: 12px; }
+.poem-verse__hidden { font: 0.85rem/1.6 var(--font-body); color: var(--ink-soft); }
+.poem-audio { text-align: center; }
+.poem-audio .btn--soft { background: #eee5fb; color: var(--berry-deep); }
+.poem-audio__buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; }
+.poem-audio__message { color: #af425f; font-size: 0.85rem; line-height: 1.6; }
+.poem-meaning { width: min(100%, 780px); margin: 0 auto; padding: 22px 24px; border-radius: 22px; background: #fff; border: 1px solid #ece4f5; }
+.poem-meaning h2 { font-size: 1rem; color: var(--berry-deep); }
+.poem-meaning p { margin: 10px 0 0; line-height: 1.9; }
+.poem-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; width: min(100%, 780px); margin: 0 auto; }
+.poem-bottom p { color: var(--ink-soft); font-size: 0.8rem; }
+
+.poem-question { width: min(100%, 780px); margin: 20px auto; }
+.poem-question h1 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin: 12px 0 24px; }
+.poem-question__verse { font: 1.9rem/1.8 'Kaiti SC', 'KaiTi', serif; text-align: center; color: var(--plum); }
+.poem-choices { display: grid; gap: 12px; }
+.poem-choice { padding: 18px 22px; border: 2px solid #eee6f6; border-radius: 18px; background: white; text-align: center; font-size: 1.1rem; line-height: 1.7; }
+.poem-choices--meaning .poem-choice { text-align: left; font-size: 0.95rem; }
+.poem-choice.is-selected { border-color: var(--berry); background: #f4effc; }
+.poem-choice:disabled { cursor: default; color: inherit; }
+.poem-order ol { min-height: 64px; padding: 18px 20px 18px 44px; border: 1px dashed #d4bee9; border-radius: 18px; background: #fff; line-height: 2; }
+.poem-order__choices { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.poem-order__choices .btn { white-space: normal; line-height: 1.5; }
+.poem-feedback { width: min(100%, 780px); margin: 0 auto; padding: 18px; border-radius: 18px; background: #fff0e4; color: #814628; line-height: 1.8; }
+.poem-feedback.is-correct { background: #e6f6eb; color: #25694f; }
+.poem-feedback p { margin: 8px 0 0; }
+.poem-progress { width: 100%; height: 10px; accent-color: var(--berry-deep); }
+.poem-result { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 80dvh; text-align: center; }
+.poem-result h1 { font-size: clamp(1.4rem, 4vw, 2rem); }
+.poem-result p { margin: 0; }
+.poem-result__stars { font-size: 2.3rem; }
+.app-poetry button:disabled { cursor: default; }
+.app-poetry button:disabled:not(.poem-choice) { opacity: 0.5; }
+
+@media (max-width: 900px) {
+  .poetry-grades { grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; }
+  .poetry-grades .grade:first-child { grid-column: 1 / -1; }
+  .poetry-note { border-top: none; padding: 0; }
+}
+@media (max-width: 640px) {
+  .app-poetry .study-settings { gap: 12px; }
+  .poetry-grades { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .poetry-grades .grade { min-height: 44px; padding: 10px 4px; font-size: 0.85rem; }
+  .poetry-grades .grade:first-child { grid-column: span 2; }
+  .poetry-note strong, .poetry-note p:first-of-type { display: none; }
+  .app-poetry .hero__title { font-size: 1.35rem; }
+  .poetry-note p { margin-top: 4px; }
+  .poem-card { padding: 14px; }
+  .poem-card .lesson__title { font-size: 0.95rem; }
+  .poem-card__opening { font-size: 0.9rem; }
+  .poem-study .bar > strong { font-size: 0.9rem; }
+  .poem-paper { padding-bottom: 24px; }
+  .poem-verse { padding-inline: 8px; }
+  .poem-meaning { padding: 18px; }
+  .poem-bottom { justify-content: center; }
+  .poem-bottom p { margin: 0; }
+  .poem-order__choices .btn { font-size: 0.9rem; padding: 10px 14px; }
+}
