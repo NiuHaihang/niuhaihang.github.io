@@ -12,6 +12,7 @@ import { useI18n } from './i18n/I18nProvider';
 import { dayKey, loadProgress, saveProgress, streakLength } from './lib/storage';
 import { stopSpeaking } from './lib/audio';
 import { useStarCollection } from './lib/useStarCollection';
+import { useStudyNavigation } from './lib/useStudyNavigation';
 
 export function App() {
   const { lang, t } = useI18n();
@@ -20,6 +21,8 @@ export function App() {
   const banked = useRef<string>('');
   const [rewardTotal, setRewardTotal] = useState(0);
   const collection = useStarCollection('english', Object.values(progress.stars).reduce((sum, stars) => sum + stars, 0));
+  const navigation = useStudyNavigation(state, () => dispatch({ type: 'home' }),
+    (saved) => dispatch({ type: 'restore', state: saved }));
 
   useEffect(() => {
     setProgress((prev) => ({ ...prev, grade: state.grade, topic: state.topic }));
@@ -31,22 +34,21 @@ export function App() {
 
   useEffect(() => {
     stopSpeaking();
-    window.scrollTo({ top: 0 });
   }, [state.index, state.screen]);
 
   const start = useCallback(
     (content: LessonContent, mode: 'lesson' | 'challenge' = 'lesson') => {
       if (!content.ready) return;
-      dispatch({
+      navigation.open(() => dispatch({
         type: 'start',
         mode,
         lessonId: content.id,
         lessonTitle: content.title,
         exercises: buildLesson(content, randomSeed()),
         now: Date.now(),
-      });
+      }));
     },
-    [],
+    [navigation.open],
   );
 
   const summary = useMemo(() => summarize(state), [state]);
@@ -56,15 +58,15 @@ export function App() {
     const today = dayKey();
     const exercises = buildReview(progress.memory, today, randomSeed());
     if (exercises.length === 0) return;
-    dispatch({
+    navigation.open(() => dispatch({
       type: 'start',
       mode: 'review',
       lessonId: 'review',
       lessonTitle: t('review'),
       exercises,
       now: Date.now(),
-    });
-  }, [progress.memory, t]);
+    }));
+  }, [progress.memory, t, navigation.open]);
 
   const onAnswer = useCallback(
     (value: string, correct: boolean) => {
@@ -96,19 +98,19 @@ export function App() {
         };
       });
     }
-    dispatch({ type: 'next', now: Date.now() });
-  }, [state.index, state.exercises.length, state.lessonId, state.startedAt, state.mode, summary.correct, summary.stars, collection.claim]);
+    navigation.open(() => dispatch({ type: 'next', now: Date.now() }));
+  }, [state.index, state.exercises.length, state.lessonId, state.startedAt, state.mode, summary.correct, summary.stars, collection.claim, navigation.open]);
 
   const again = useCallback(() => {
     if (state.mode === 'review') {
       // Replay the completed review even when its items are now due tomorrow.
-      dispatch({ type: 'again', exercises: state.exercises, now: Date.now() });
+      navigation.open(() => dispatch({ type: 'again', exercises: state.exercises, now: Date.now() }));
       return;
     }
     const content = lessonById(state.lessonId);
     if (!content) return;
-    dispatch({ type: 'again', exercises: buildLesson(content, randomSeed()), now: Date.now() });
-  }, [state.lessonId, state.mode, state.exercises]);
+    navigation.open(() => dispatch({ type: 'again', exercises: buildLesson(content, randomSeed()), now: Date.now() }));
+  }, [state.lessonId, state.mode, state.exercises, navigation.open]);
 
   const streak = streakLength(progress.days);
 
@@ -132,7 +134,7 @@ export function App() {
         />
       ) : null}
 
-      {state.screen === 'lesson' ? <Lesson state={state} onAnswer={onAnswer} onNext={onNext} onExit={() => dispatch({ type: 'home' })} /> : null}
+      {state.screen === 'lesson' ? <Lesson state={state} onAnswer={onAnswer} onNext={onNext} onExit={navigation.back} /> : null}
 
       {state.screen === 'result' ? (
         <Result
@@ -144,7 +146,7 @@ export function App() {
           isReview={state.mode === 'review'}
           isChallenge={state.mode === 'challenge'}
           onAgain={again}
-          onHome={() => dispatch({ type: 'home' })}
+          onHome={navigation.back}
         />
       ) : null}
     </div>

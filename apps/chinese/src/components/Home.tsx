@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BOOKS, GRADES, UNITS, type Grade, type Term, type Unit } from '../content';
 import type { Progress } from '../lib/storage';
 import { streakLength } from '../../../english/src/lib/storage';
@@ -6,6 +5,8 @@ import { Mascot } from '../../../english/src/components/Mascot';
 
 interface Props {
   progress: Progress;
+  page: number;
+  onPage: (page: number) => void;
   onGrade: (grade: Grade) => void;
   onTerm: (term: Term) => void;
   onStart: (unit: Unit) => void;
@@ -13,8 +14,7 @@ interface Props {
   onToggleSound: () => void;
 }
 
-export function Home({ progress, onGrade, onTerm, onStart, onReview, onToggleSound }: Props) {
-  const [page, setPage] = useState(0);
+export function Home({ progress, page, onPage, onGrade, onTerm, onStart, onReview, onToggleSound }: Props) {
   const book = BOOKS.find((book) => book.grade === progress.grade && book.term === progress.term)!;
   const units = UNITS.filter((unit) => unit.bookId === book.id);
   const pages = Math.ceil(units.length / 12);
@@ -137,9 +137,9 @@ export function Home({ progress, onGrade, onTerm, onStart, onReview, onToggleSou
             ))}
           </div>
           <nav className="unit-pages" aria-label="识字分组翻页">
-            <button type="button" className="pillbtn pillbtn--text" disabled={page === 0} onClick={() => setPage(page - 1)}>← 上一页</button>
+            <button type="button" className="pillbtn pillbtn--text" disabled={page === 0} onClick={() => onPage(page - 1)}>← 上一页</button>
             <span>第 <strong>{page + 1}</strong> / {pages} 页</span>
-            <button type="button" className="pillbtn pillbtn--text" disabled={page === pages - 1} onClick={() => setPage(page + 1)}>下一页 →</button>
+            <button type="button" className="pillbtn pillbtn--text" disabled={page === pages - 1} onClick={() => onPage(page + 1)}>下一页 →</button>
           </nav>
           <details className="content-note textbook-source">
             <summary>教材与字库说明</summary>

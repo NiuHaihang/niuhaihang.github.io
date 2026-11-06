@@ -34,6 +34,7 @@ export interface SessionState {
 }
 
 export type Action =
+  | { type: 'restore'; state: SessionState }
   | { type: 'setGrade'; grade: Grade }
   | { type: 'setTopic'; topic: Topic }
   | {
@@ -70,6 +71,8 @@ export function initialState(grade: Grade = 3, topic: Topic = 'words'): SessionS
 
 export function reducer(state: SessionState, action: Action): SessionState {
   switch (action.type) {
+    case 'restore':
+      return action.state;
     case 'setGrade':
       return { ...state, grade: action.grade };
     case 'setTopic':

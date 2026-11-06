@@ -44,6 +44,7 @@ export function initialState(level: LevelId, track: Track = 'addsub'): SessionSt
 }
 
 export type Action =
+  | { type: 'restore'; state: SessionState }
   | { type: 'start'; level: LevelId; seed: number; now: number }
   | { type: 'startPractice'; skill: SkillId; seed: number; now: number }
   | { type: 'playAgain'; seed: number; now: number }
@@ -60,6 +61,8 @@ const MAX_DIGITS = 3;
 
 export function reducer(state: SessionState, action: Action): SessionState {
   switch (action.type) {
+    case 'restore':
+      return action.state;
     case 'start': {
       const round = generateRound(state.track, action.level, action.seed);
       return {

@@ -14,6 +14,7 @@ interface QuizProps {
   state: SessionState;
   dispatch: (action: Action) => void;
   soundOn: boolean;
+  onHome: () => void;
 }
 
 function nudgeKey(item: Item): StringKey {
@@ -25,7 +26,7 @@ function nudgeKey(item: Item): StringKey {
   return 'hint.countBack';
 }
 
-export function Quiz({ state, dispatch, soundOn }: QuizProps) {
+export function Quiz({ state, dispatch, soundOn, onHome }: QuizProps) {
   const { t } = useI18n();
   const { sound, haptic } = useSoundFeedback(soundOn);
   const [sheet, setSheet] = useState<Item | null>(null);
@@ -212,7 +213,7 @@ export function Quiz({ state, dispatch, soundOn }: QuizProps) {
                 className="btn btn--primary"
                 onClick={() => {
                   setLeaveAsk(false);
-                  dispatch({ type: 'home' });
+                  onHome();
                 }}
               >
                 {t('quiz.leave')}

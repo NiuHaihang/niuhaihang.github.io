@@ -13,9 +13,10 @@ import type { StringKey } from '../i18n/strings';
 interface ResultProps {
   state: SessionState;
   dispatch: (action: Action) => void;
+  onHome: () => void;
 }
 
-export function Result({ state, dispatch }: ResultProps) {
+export function Result({ state, dispatch, onHome }: ResultProps) {
   const { t } = useI18n();
   const [sheet, setSheet] = useState<Item | null>(null);
   const [burst] = useState(1);
@@ -117,7 +118,7 @@ export function Result({ state, dispatch }: ResultProps) {
           </button>
         ) : null}
 
-        <button type="button" className="btn btn--ghost" onClick={() => dispatch({ type: 'home' })}>
+        <button type="button" className="btn btn--ghost" onClick={onHome}>
           {t('result.home')}
         </button>
       </div>

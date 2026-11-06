@@ -10,6 +10,7 @@ import type { LevelId, Track } from './game/types';
 import { I18nProvider } from './i18n/I18nProvider';
 import type { Lang } from './i18n/strings';
 import { sound } from './lib/sound';
+import { useStudyNavigation } from '../../english/src/lib/useStudyNavigation';
 import {
   clearProgress,
   dayKey,
@@ -27,6 +28,13 @@ export function App() {
   );
   const [printing, setPrinting] = useState(false);
   const recorded = useRef<string | null>(null);
+  const navigation = useStudyNavigation({ state, printing }, () => {
+    setPrinting(false);
+    dispatch({ type: 'home' });
+  }, (saved) => {
+    setPrinting(saved.printing);
+    dispatch({ type: 'restore', state: saved.state });
+  });
 
   /* persist anything the child earns or toggles */
   useEffect(() => {
@@ -97,7 +105,7 @@ export function App() {
         </div>
 
         {printing ? (
-          <PrintSheet level={state.level} track={state.track} onClose={() => setPrinting(false)} />
+          <PrintSheet level={state.level} track={state.track} onClose={navigation.back} />
         ) : state.screen === 'home' ? (
           <Home
             progress={progress}
@@ -105,8 +113,8 @@ export function App() {
             track={state.track}
             onSetTrack={setTrack}
             onSetLevel={setLevel}
-            onStart={() => dispatch({ type: 'start', level: state.level, seed: randomSeed(), now: Date.now() })}
-            onPrint={() => setPrinting(true)}
+            onStart={() => navigation.open(() => dispatch({ type: 'start', level: state.level, seed: randomSeed(), now: Date.now() }))}
+            onPrint={() => navigation.open(() => setPrinting(true))}
             onToggleSound={() => setProgress((prev) => ({ ...prev, sound: !prev.sound }))}
             onToggleLang={() => setLang(progress.lang === 'en' ? 'zh' : 'en')}
             onReset={() => {
@@ -120,9 +128,9 @@ export function App() {
             }}
           />
         ) : state.screen === 'quiz' ? (
-          <Quiz state={state} dispatch={dispatch} soundOn={progress.sound} />
+          <Quiz state={state} dispatch={dispatch} soundOn={progress.sound} onHome={navigation.back} />
         ) : (
-          <Result state={state} dispatch={dispatch} />
+          <Result state={state} dispatch={dispatch} onHome={navigation.back} />
         )}
       </div>
     </I18nProvider>

@@ -5,6 +5,7 @@ import { Home } from './components/Home';
 import { PoemStudy } from './components/PoemStudy';
 import { PoemQuiz } from './components/PoemQuiz';
 import { useStarCollection } from '../../english/src/lib/useStarCollection';
+import { useStudyNavigation } from '../../english/src/lib/useStudyNavigation';
 
 type View = { screen: 'home' } | { screen: 'study' | 'quiz'; poem: Poem };
 
@@ -12,6 +13,8 @@ export function App() {
   const [progress, setProgress] = useState(loadProgress);
   const [view, setView] = useState<View>({ screen: 'home' });
   const [round, setRound] = useState(0);
+  const navigation = useStudyNavigation({ view, round }, () => setView({ screen: 'home' }),
+    (saved) => { setView(saved.view); setRound(saved.round); });
   const collection = useStarCollection('poetry', Object.values(progress.stars).reduce((sum, stars) => sum + stars, 0));
 
   function update(next: Progress) {
@@ -20,9 +23,10 @@ export function App() {
   }
 
   function navigate(next: View) {
-    if (next.screen === 'quiz') setRound((previous) => previous + 1);
-    setView(next);
-    window.scrollTo({ top: 0 });
+    navigation.open(() => {
+      if (next.screen === 'quiz') setRound((previous) => previous + 1);
+      setView(next);
+    });
   }
 
   return <main className="app app-poetry">
@@ -32,14 +36,14 @@ export function App() {
       onStudy={(poem) => navigate({ screen: 'study', poem })}
       onQuiz={(poem) => navigate({ screen: 'quiz', poem })} /> : null}
     {view.screen === 'study' ? <PoemStudy key={view.poem.id} poem={view.poem} sound={progress.sound}
-      onHome={() => navigate({ screen: 'home' })}
+      onHome={navigation.back}
       onComplete={() => {
         update(completeStudy(progress, view.poem.id));
-        navigate({ screen: 'home' });
+        navigation.back();
       }}
       onQuiz={() => navigate({ screen: 'quiz', poem: view.poem })} /> : null}
     {view.screen === 'quiz' ? <PoemQuiz key={round} poem={view.poem} totalStars={collection.total}
-      onHome={() => navigate({ screen: 'home' })}
+      onHome={navigation.back}
       onStudy={() => navigate({ screen: 'study', poem: view.poem })}
       onAgain={() => navigate({ screen: 'quiz', poem: view.poem })}
       onNext={() => {

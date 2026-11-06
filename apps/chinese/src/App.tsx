@@ -7,6 +7,7 @@ import { Home } from './components/Home';
 import { Learn } from './components/Learn';
 import { Quiz } from './components/Quiz';
 import { Result } from './components/Result';
+import { useStudyNavigation } from '../../english/src/lib/useStudyNavigation';
 
 type View =
   | { screen: 'home' }
@@ -17,6 +18,8 @@ type View =
 export function App() {
   const [progress, setProgress] = useState(loadProgress);
   const [view, setView] = useState<View>({ screen: 'home' });
+  const [page, setPage] = useState(0);
+  const navigation = useStudyNavigation(view, () => setView({ screen: 'home' }), setView);
 
   // Save during the action so immediately following another subject link cannot
   // leave before a deferred React effect has persisted the new preference.
@@ -26,7 +29,7 @@ export function App() {
   }
 
   function startQuiz(characters: Character[], unit?: Unit) {
-    setView({ screen: 'quiz', questions: buildRound(characters, randomSeed()), unit });
+    navigation.open(() => setView({ screen: 'quiz', questions: buildRound(characters, randomSeed()), unit }));
   }
 
   return (
@@ -35,9 +38,11 @@ export function App() {
         <Home
           key={`${progress.grade}-${progress.term}`}
           progress={progress}
-          onTerm={(term) => updateProgress({ ...progress, term })}
-          onGrade={(grade) => updateProgress({ ...progress, grade })}
-          onStart={(unit) => setView({ screen: 'learn', unit })}
+          page={page}
+          onPage={setPage}
+          onTerm={(term) => { setPage(0); updateProgress({ ...progress, term }); }}
+          onGrade={(grade) => { setPage(0); updateProgress({ ...progress, grade }); }}
+          onStart={(unit) => navigation.open(() => setView({ screen: 'learn', unit }))}
           onReview={() => startQuiz(progress.mistakes.slice(0, 6).map((char) => CHARACTER_BY_ID[char]!))}
           onToggleSound={() => updateProgress({ ...progress, sound: !progress.sound })}
         />
@@ -46,7 +51,7 @@ export function App() {
         <Learn
           unit={view.unit}
           sound={progress.sound}
-          onHome={() => setView({ screen: 'home' })}
+          onHome={navigation.back}
           onQuiz={() => startQuiz(view.unit.characters, view.unit)}
         />
       ) : null}
@@ -54,11 +59,11 @@ export function App() {
         <Quiz
           questions={view.questions}
           sound={progress.sound}
-          onHome={() => setView({ screen: 'home' })}
+          onHome={navigation.back}
           onFinish={(answers) => {
             // Exiting an unfinished round never changes the saved learning record.
             updateProgress(completeRound(progress, view.questions, answers, view.unit?.id));
-            setView({ ...view, screen: 'result', answers });
+            navigation.open(() => setView({ ...view, screen: 'result', answers }));
           }}
         />
       ) : null}
@@ -69,10 +74,10 @@ export function App() {
           questions={view.questions}
           answers={view.answers}
           sound={progress.sound}
-          onHome={() => setView({ screen: 'home' })}
+          onHome={navigation.back}
           onReview={(characters) => startQuiz(characters)}
           onAgain={() => {
-            if (view.unit) setView({ screen: 'learn', unit: view.unit });
+            if (view.unit) navigation.open(() => setView({ screen: 'learn', unit: view.unit! }));
             else startQuiz([...new Map(view.questions.map((question) => [question.target.id, question.target])).values()]);
           }}
         />
